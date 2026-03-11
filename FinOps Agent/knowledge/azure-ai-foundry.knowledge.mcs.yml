@@ -1,0 +1,6 @@
+# Name: Azure AI Foundry (Microsoft Foundry)
+# Official Microsoft documentation for Azure AI Foundry, covering AI model deployment, pricing, capacity planning, and management.
+kind: KnowledgeSourceConfiguration
+source:
+  kind: PublicSiteSearchSource
+  site: https://learn.microsoft.com/en-us/azure/ai-foundry/

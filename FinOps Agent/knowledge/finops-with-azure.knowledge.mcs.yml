@@ -1,0 +1,6 @@
+# Name: FinOps with Azure
+# Official Microsoft documentation for FinOps practices with Azure, covering FinOps framework implementation, cost optimization strategies, and cloud financial management.
+kind: KnowledgeSourceConfiguration
+source:
+  kind: PublicSiteSearchSource
+  site: https://learn.microsoft.com/en-us/azure/cost-management-billing/finops/

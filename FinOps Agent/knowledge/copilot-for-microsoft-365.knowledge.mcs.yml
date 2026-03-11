@@ -1,0 +1,6 @@
+# Name: Microsoft Copilot for Microsoft 365
+# Official Microsoft documentation for Microsoft Copilot for Microsoft 365, covering deployment, licensing, usage, and adoption guidance.
+kind: KnowledgeSourceConfiguration
+source:
+  kind: PublicSiteSearchSource
+  site: https://learn.microsoft.com/en-us/copilot/microsoft-365/

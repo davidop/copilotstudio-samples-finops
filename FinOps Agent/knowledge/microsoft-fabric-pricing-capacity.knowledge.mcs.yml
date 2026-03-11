@@ -1,0 +1,6 @@
+# Name: Microsoft Fabric Pricing and Capacity
+# Official Microsoft documentation for Microsoft Fabric, covering pricing models, capacity units (CUs), SKUs, and cost optimization.
+kind: KnowledgeSourceConfiguration
+source:
+  kind: PublicSiteSearchSource
+  site: https://learn.microsoft.com/en-us/fabric/

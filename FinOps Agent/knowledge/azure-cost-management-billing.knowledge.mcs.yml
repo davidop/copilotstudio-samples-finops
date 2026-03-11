@@ -1,0 +1,6 @@
+# Name: Azure Cost Management + Billing
+# Official Microsoft documentation for Azure Cost Management and Billing, covering cost analysis, budgets, alerts, invoices, and billing accounts.
+kind: KnowledgeSourceConfiguration
+source:
+  kind: PublicSiteSearchSource
+  site: https://learn.microsoft.com/en-us/azure/cost-management-billing/
