@@ -16,6 +16,10 @@
   <img src="https://img.shields.io/badge/Model-Claude%20Sonnet%204.6-FF6B00?style=for-the-badge&logo=anthropic&logoColor=white" alt="Model" />
 </p>
 
+<img width="1462" height="775" alt="image" src="https://github.com/user-attachments/assets/47249da6-dab2-40b3-9cd9-68e63f0c999d" />
+
+<img width="1454" height="769" alt="image" src="https://github.com/user-attachments/assets/fe1d5d3b-6556-4c55-9b15-9fef2f422228" />
+
 ---
 
 ## What This Agent Does
@@ -196,3 +200,4 @@ This project is licensed under the [MIT License](LICENSE).
 <p align="center">
   Made with ❤️ for the Microsoft community
 </p>
+
