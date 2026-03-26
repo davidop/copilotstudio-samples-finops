@@ -1,0 +1,110 @@
+mcs.metadata:
+  componentName: InformacionInsuficiente
+  description: Gestion de informacion insuficiente
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: InformacionInsuficiente
+    triggerQueries:
+      - informacion insuficiente
+      - faltan datos
+      - datos incompletos
+
+  actions:
+    - kind: SendActivity
+      id: send_insufficient_header
+      activity: No he podido completar una evaluacion fiable del documento porque falta informacion minima para aplicar los criterios PMO.
+
+    - kind: SendActivity
+      id: send_required_fields_hint
+      activity: |
+        Para continuar con el analisis del documento, conviene aportar al menos:
+        - Categoria de servicio del catalogo PMO
+        - Modelo de oferta usado (ES/EN - Google/Microsoft)
+        - Calidad y, cuando aplique, Planificacion y Control
+        - Baseline, modalidad de facturacion, SLA y penalizaciones
+        - Riesgos, supuestos y dependencias del cliente
+
+    - kind: ConditionGroup
+      id: show_detected_missing_fields
+      conditions:
+        - id: cond_has_detected_missing_fields
+          condition: =Len(Text(Global.FaltantesDetectados)) > 0
+          actions:
+            - kind: SendActivity
+              id: send_detected_missing_fields
+              activity: "Huecos detectados en el documento o extracto recibido: {Global.FaltantesDetectados}"
+
+    - kind: Question
+      id: ask_insufficient_path
+      alwaysPrompt: true
+      variable: Topic.PathInsuficiente
+      prompt: Selecciona como quieres continuar con la evaluacion
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Emitir evaluacion parcial con la evidencia disponible"
+          value: "Parcial"
+        - display: "Reintentar con otro documento o mas informacion"
+          value: "AdjuntarMas"
+        - display: "Completar con formulario guiado"
+          value: "Formulario"
+        - display: "Cancelar"
+          value: "Cancelar"
+
+    - kind: ConditionGroup
+      id: route_insufficient
+      conditions:
+        - id: cond_parcial
+          condition: =Topic.PathInsuficiente = "Parcial"
+          actions:
+            - kind: Question
+              id: confirm_parcial
+              alwaysPrompt: true
+              variable: Topic.ConfirmParcial
+              prompt: Proceder con una evaluacion parcial del documento?
+              entity: StringPrebuiltEntity
+              choices:
+                - display: "Si"
+                  value: "SI"
+                - display: "No"
+                  value: "NO"
+
+            - kind: ConditionGroup
+              id: confirm_parcial_route
+              conditions:
+                - id: cond_si_parcial
+                  condition: =Topic.ConfirmParcial = "SI"
+                  actions:
+                    - kind: SetVariable
+                      id: set_nivel_parcial
+                      variable: Topic.NivelAnalisis
+                      value: "Parcial"
+                    - kind: BeginDialog
+                      id: goto_validar_parcial
+                      dialog: crd3a_agente.topic.Validaroferta
+
+              elseActions:
+                - kind: BeginDialog
+                  id: goto_cargar_contenido_atras
+                  dialog: crd3a_agente.topic.CargarContenido
+
+        - id: cond_adjuntar_mas
+          condition: =Topic.PathInsuficiente = "AdjuntarMas"
+          actions:
+            - kind: BeginDialog
+              id: goto_cargar_nuevamente
+              dialog: crd3a_agente.topic.CargarContenido
+
+        - id: cond_formulario_insuf
+          condition: =Topic.PathInsuficiente = "Formulario"
+          actions:
+            - kind: BeginDialog
+              id: goto_formulario_insuf
+              dialog: crd3a_agente.topic.FormularioResumen
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_menu_cancelar
+          dialog: crd3a_agente.topic.MainMenu

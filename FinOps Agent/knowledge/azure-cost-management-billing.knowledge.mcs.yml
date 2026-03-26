@@ -1,5 +1,6 @@
-# Name: Azure Cost Management + Billing
-# Official Microsoft documentation for Azure Cost Management and Billing, covering cost analysis, budgets, alerts, invoices, and billing accounts.
+mcs.metadata:
+  componentName: Azure Cost Management + Billing
+  description: Official Microsoft documentation for Azure Cost Management and Billing, covering cost analysis, budgets, alerts, invoices, and billing accounts.
 kind: KnowledgeSourceConfiguration
 source:
   kind: PublicSiteSearchSource

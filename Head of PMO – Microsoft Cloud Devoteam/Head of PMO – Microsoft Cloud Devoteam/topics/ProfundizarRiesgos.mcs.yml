@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: ProfundizarRiesgos
+  description: Analisis detallado de riesgos
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: ProfundizarRiesgos
+    triggerQueries:
+      - profundizar riesgos
+      - analisis riesgos
+
+  actions:
+    - kind: SendActivity
+      id: send_riesgos_body
+      activity: "Profundizacion de riesgos PMO: foco en alcance, dependencias cliente, SLA/penalizaciones, supuestos contractuales y mitigaciones con owner."
+
+    - kind: Question
+      id: ask_riesgos_action
+      alwaysPrompt: true
+      variable: Topic.AccionDespuesProfundizacion
+      prompt: Selecciona
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Nueva revision"
+          value: "NuevaRevision"
+        - display: "Cerrar"
+          value: "Cerrar"
+        - display: "Profundizar delivery"
+          value: "ProfundizarDelivery"
+        - display: "Profundizar economico"
+          value: "ProfundizarEconomico"
+
+    - kind: ConditionGroup
+      id: route_after_riesgos
+      conditions:
+        - id: cond_nueva_rev_riesgos
+          condition: =Topic.AccionDespuesProfundizacion = "NuevaRevision"
+          actions:
+            - kind: BeginDialog
+              id: goto_reinicio_desde_riesgos
+              dialog: crd3a_agente.topic.ReinicioControlado
+
+        - id: cond_delivery_desde_riesgos
+          condition: =Topic.AccionDespuesProfundizacion = "ProfundizarDelivery"
+          actions:
+            - kind: BeginDialog
+              id: goto_delivery_desde_riesgos
+              dialog: crd3a_agente.topic.ProfundizarDeliveryStaffing
+
+        - id: cond_economico_desde_riesgos
+          condition: =Topic.AccionDespuesProfundizacion = "ProfundizarEconomico"
+          actions:
+            - kind: BeginDialog
+              id: goto_economico_desde_riesgos
+              dialog: crd3a_agente.topic.ProfundizarEconomico
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_cierre_desde_riesgos
+          dialog: crd3a_agente.topic.CierreSeguro

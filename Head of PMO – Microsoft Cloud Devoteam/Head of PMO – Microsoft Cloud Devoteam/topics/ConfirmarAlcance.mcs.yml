@@ -1,0 +1,46 @@
+mcs.metadata:
+  componentName: ConfirmarAlcance
+  description: Seleccion de profundidad del analisis
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: ConfirmarAlcance
+    triggerQueries:
+      - profundidad
+      - alcance
+      - ejecutiva
+      - completa
+
+  actions:
+    - kind: SendActivity
+      id: send_scope_intro
+      activity: |
+        Cuanta profundidad deseas para el analisis PMO?
+
+    - kind: Question
+      id: ask_analysis_depth
+      alwaysPrompt: true
+      variable: Topic.NivelAnalisis
+      prompt: Selecciona la profundidad del analisis
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Ejecutiva (go/no-go y riesgos mayores)"
+          value: "Ejecutiva"
+        - display: "Completa (calidad, alcance, contrato, delivery, coste)"
+          value: "Completa"
+        - display: "Solo riesgos criticos"
+          value: "SoloCriticos"
+        - display: "Solo delivery y staffing"
+          value: "SoloDelivery"
+        - display: "Solo revision economica"
+          value: "SoloEconomico"
+
+    - kind: SendActivity
+      id: send_confirmation
+      activity: Profundidad seleccionada {Topic.NivelAnalisis}. Iniciando analisis.
+
+    - kind: BeginDialog
+      id: goto_validar_oferta
+      dialog: crd3a_agente.topic.Validaroferta

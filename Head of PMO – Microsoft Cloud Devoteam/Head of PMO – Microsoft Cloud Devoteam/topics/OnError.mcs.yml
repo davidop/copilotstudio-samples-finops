@@ -1,0 +1,55 @@
+mcs.metadata:
+  componentName: Al producirse un error
+  description: Manejo personalizado de errores
+kind: AdaptiveDialog
+startBehavior: UseLatestPublishedContentAndCancelOtherTopics
+beginDialog:
+  kind: OnError
+  id: main
+  actions:
+    - kind: SetVariable
+      id: set_error_timestamp
+      variable: Topic.ErrorTimestamp
+      value: =Text(Now(), DateTimeFormat.UTC)
+
+    - kind: SendActivity
+      id: send_error_friendly
+      activity: Ocurrio un error inesperado. Elige como continuar.
+
+    - kind: Question
+      id: ask_recovery_path
+      alwaysPrompt: true
+      variable: Topic.RecoveryPath
+      prompt: Cual prefieres?
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Reintentar"
+          value: "Reintentar"
+        - display: "Pegar contenido"
+          value: "Pegar"
+        - display: "Formulario manual"
+          value: "Manual"
+        - display: "Menu principal"
+          value: "Menu"
+
+    - kind: ConditionGroup
+      id: route_recovery
+      conditions:
+        - id: cond_paste
+          condition: =Topic.RecoveryPath = "Pegar"
+          actions:
+            - kind: BeginDialog
+              id: goto_pegar
+              dialog: crd3a_agente.topic.CargarContenido
+
+        - id: cond_manual_recovery
+          condition: =Topic.RecoveryPath = "Manual"
+          actions:
+            - kind: BeginDialog
+              id: goto_manual
+              dialog: crd3a_agente.topic.FormularioResumen
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_menu
+          dialog: crd3a_agente.topic.MainMenu

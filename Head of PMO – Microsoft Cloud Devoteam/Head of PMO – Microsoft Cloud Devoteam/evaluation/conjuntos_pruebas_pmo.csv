@@ -1,0 +1,26 @@
+id,conjunto,objetivo,input_usuario,resultado_esperado,respuesta_debe_incluir
+HP-01,HappyPath_Menu,Entrar al flujo principal,Quiero validar una oferta completa,Ir a MainMenu y luego CargarContenido,Validar oferta completa
+HP-02,HappyPath_DeteccionAutoSoporte,Detectar tipo de servicio por texto,Es un servicio de soporte y mantenimiento con SLA y baseline,TipoServicioPMO=SoporteMantenimiento,detectado automaticamente
+HP-03,HappyPath_DeteccionAutoBolsa,Detectar bolsa de horas,Oferta de bolsa de horas para evolutivos,TipoServicioPMO=BolsaHoras,bolsa de horas
+HP-04,HappyPath_DeteccionAutoAgile,Detectar team agile,Propuesta de team agile por sprints con backlog,TipoServicioPMO=TeamAgile,team agile
+HP-05,HappyPath_DeteccionAutoProyecto,Detectar proyecto cerrado/evolutivo,Proyecto cerrado con alcance y fecha de entrega,TipoServicioPMO=ProyectoCerradoEvolutivo,proyecto cerrado
+HP-06,HappyPath_DeteccionAutoConsultoria,Detectar consultoria/adopcion,Servicio de consultoria y adopcion con plan de cambio,TipoServicioPMO=ConsultoriaAdopcion,consultoria
+HP-07,HappyPath_ResultadoConTrazabilidad,Verificar trazabilidad en resultado,Mostrar resultado,Ir a MostrarResultado y exponer trazabilidad,Trazabilidad: tipo de servicio
+EP-01,ErrorPath_InfoInsuficiente,Faltan datos para validar,Solo tengo un resumen de dos lineas,Ir a InformacionInsuficiente,Falta informacion
+EP-02,ErrorPath_PDF,Recuperacion por fallo de adjunto,El pdf no funciona,Ir a ErrorAdjunto,Elige una alternativa
+EP-03,ErrorPath_OnError,Recuperacion de error inesperado,Ha ocurrido un error,Ir a OnError y ofrecer caminos,Cual prefieres
+EP-04,ErrorPath_Fallback,Entrada no entendida,asdf qwer zzzz,Ir a Fallback,menu
+EP-05,ErrorPath_Ambiguedad,Resolver intencion multiple,Quiero revisar y mejorar oferta,Ir a MultipleTopicsMatched,Selecciona la intencion correcta
+REG-01,Regresion_Rutas,Validar transiciones basicas,Quiero nueva revision,Ir a ReinicioControlado,Nueva revision
+REG-02,Regresion_Cierre,Cerrar flujo correctamente,Cerrar sesion,Ir a CierreSeguro,Sesion cerrada
+REG-03,Regresion_Mejora,Entrar en mejora de propuesta,Mejora esta propuesta,Ir a MejorarOferta,Que aspecto deseas mejorar
+HP-08,HappyPath_SinonimoSoporte,Detectar soporte por sinonimo,Servicio gestionado tipo help desk con tickets y SLA,TipoServicioPMO=SoporteMantenimiento,confianza Alta
+HP-09,HappyPath_SinonimoBolsa,Detectar bolsa por sinonimo,Modelo time and material con consumo de horas mensual,TipoServicioPMO=BolsaHoras,confianza Alta
+HP-10,HappyPath_SinonimoAgile,Detectar agile por sinonimo,Squad scrum con velocity y backlog priorizado,TipoServicioPMO=TeamAgile,confianza Alta
+HP-11,HappyPath_SinonimoProyecto,Detectar proyecto por sinonimo,Fixed price con milestones y alcance cerrado,TipoServicioPMO=ProyectoCerradoEvolutivo,confianza Alta
+HP-12,HappyPath_SinonimoConsultoria,Detectar consultoria por sinonimo,Advisory con workshop y change management para adopcion,TipoServicioPMO=ConsultoriaAdopcion,confianza Alta
+HP-13,HappyPath_NombreArchivoSoporte,Detectar soporte por nombre de archivo,Adjunto oferta_service-desk_operacion_v3.docx,TipoServicioPMO=SoporteMantenimiento,confianza Media
+HP-14,HappyPath_NombreArchivoBolsa,Detectar bolsa por nombre de archivo,Adjunto propuesta_time-material_2026.pdf,TipoServicioPMO=BolsaHoras,confianza Media
+HP-15,HappyPath_NombreArchivoAgile,Detectar agile por nombre de archivo,Adjunto team_agile_backlog_sprint5.pptx,TipoServicioPMO=TeamAgile,confianza Media
+HP-16,HappyPath_NombreArchivoProyecto,Detectar proyecto por nombre de archivo,Adjunto fixed_price_milestone_plan_v1.docx,TipoServicioPMO=ProyectoCerradoEvolutivo,confianza Media
+HP-17,HappyPath_NombreArchivoConsultoria,Detectar consultoria por nombre de archivo,Adjunto consulting_change_adoption_pack.pdf,TipoServicioPMO=ConsultoriaAdopcion,confianza Media

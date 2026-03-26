@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: Alternativa
+  description: Fallback personalizado - Recordar propósito del agente y reconducir al flujo
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnUnknownIntent
+  id: main
+  actions:
+    - kind: ConditionGroup
+      id: check_fallback_count
+      conditions:
+        - id: cond_first_fallback
+          condition: =System.FallbackCount < 2
+          actions:
+            - kind: SendActivity
+              id: send_alternativa_1
+              activity: |
+                No he reconocido eso, pero puedo ayudarte con:
+
+                ✓ Validar ofertas completas
+                ✓ Revisar riesgos
+                ✓ Analizar viabilidad técnica
+                ✓ Revisar modelo económico
+                ✓ Mejorar propuestas
+
+                **Ejemplos de cosas que puedes decir:**
+                • "Validar oferta"
+                • "Menú"
+                • "Revisión de riesgos"
+                • "Mejorar propuesta"
+
+                ¿Qué necesitas?
+
+        - id: cond_second_fallback
+          condition: =System.FallbackCount < 4
+          actions:
+            - kind: SendActivity
+              id: send_alternativa_2
+              activity: |
+                Parece que tenemos un desajuste. 
+
+                Mi propósito es validar y revisar **ofertas de preventa cloud** de la unidad Microsoft Cloud.
+
+                **Para comenzar, di:**
+                • "Menú"
+                • "Validar oferta"
+                • "Cargar contenido"
+
+                O si lo prefieres, escribe de forma más natural: "Quiero validar una propuesta"
+
+      elseActions:
+        - kind: SendActivity
+          id: send_alternativa_3
+          activity: |
+            No conseguimos entendernos bien.
+
+            Te sugiero:
+            1. Escribe "menú" para ver todas las opciones
+            2. O describe directamente lo que necesitas
+
+            Si tienes una oferta para validar, adjunta un PDF o pásame el contenido en texto.
+
+        - kind: BeginDialog
+          id: goto_escalate
+          dialog: crd3a_agente.topic.Escalate

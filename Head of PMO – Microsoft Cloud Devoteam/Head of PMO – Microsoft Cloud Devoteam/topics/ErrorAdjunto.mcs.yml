@@ -1,0 +1,73 @@
+mcs.metadata:
+  componentName: ErrorAdjunto
+  description: Manejo de fallo de carga PDF
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: ErrorAdjunto
+    triggerQueries:
+      - error archivo
+      - pdf no funciona
+      - no puedo adjuntar
+
+  actions:
+    - kind: SendActivity
+      id: send_pdf_error
+      activity: No he podido leer el documento adjunto de forma util para la evaluacion. Elige como quieres continuar.
+
+    - kind: Question
+      id: ask_alternative_path
+      alwaysPrompt: true
+      variable: Topic.ModoEntrada
+      prompt: Selecciona una alternativa para continuar con el analisis
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Pegar un extracto del documento"
+          value: "PegadoTexto"
+        - display: "Introducir la informacion manualmente"
+          value: "ManualStructured"
+
+    - kind: ConditionGroup
+      id: route_alternative
+      conditions:
+        - id: cond_pegar
+          condition: =Topic.ModoEntrada = "PegadoTexto"
+          actions:
+            - kind: Question
+              id: ask_paste_from_error
+              alwaysPrompt: true
+              variable: Topic.ContenidoPegado
+              prompt: Pega un extracto del documento (prioriza categoria de servicio, alcance, calidad, planificacion/control, coste, SLA y riesgos)
+              entity: StringPrebuiltEntity
+
+            - kind: ConditionGroup
+              id: check_error_paste_content_quality
+              conditions:
+                - id: cond_error_paste_content_insufficient
+                  condition: =Len(Topic.ContenidoPegado) < 300 Or !("alcance" in Lower(Text(Topic.ContenidoPegado))) Or !(("coste" in Lower(Text(Topic.ContenidoPegado))) Or ("presupuesto" in Lower(Text(Topic.ContenidoPegado))) Or ("facturacion" in Lower(Text(Topic.ContenidoPegado)))) Or !(("riesgo" in Lower(Text(Topic.ContenidoPegado))) Or ("supuesto" in Lower(Text(Topic.ContenidoPegado))))
+                  actions:
+                    - kind: SetVariable
+                      id: set_missing_fields_error_paste
+                      variable: Global.FaltantesDetectados
+                      value: "Incluye al menos: alcance, modelo economico (coste/presupuesto/facturacion) y riesgos/supuestos."
+
+                    - kind: BeginDialog
+                      id: goto_insufficient_from_error_paste
+                      dialog: crd3a_agente.topic.InformacionInsuficiente
+
+              elseActions:
+                - kind: SetVariable
+                  id: set_global_tipo_proyecto_from_error_paste
+                  variable: Global.ResumenTipoProyecto
+                  value: =Topic.ContenidoPegado
+
+                - kind: BeginDialog
+                  id: goto_confirmar_desde_error_pegar
+                  dialog: crd3a_agente.topic.ConfirmarAlcance
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_formulario_desde_error
+          dialog: crd3a_agente.topic.FormularioResumen

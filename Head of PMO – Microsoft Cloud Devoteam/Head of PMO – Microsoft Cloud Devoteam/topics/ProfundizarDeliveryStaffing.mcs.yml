@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: ProfundizarDeliveryStaffing
+  description: Analisis detallado de delivery y staffing
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: ProfundizarDeliveryStaffing
+    triggerQueries:
+      - profundizar delivery
+      - profundizar staffing
+
+  actions:
+    - kind: SendActivity
+      id: send_delivery_body
+      activity: "Profundizacion delivery/staffing PMO: valida modelo operativo, responsable del servicio/proyecto, capacidad del equipo, hitos y dependencias cliente."
+
+    - kind: Question
+      id: ask_delivery_action
+      alwaysPrompt: true
+      variable: Topic.AccionDespuesProfundizacion
+      prompt: Selecciona
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Nueva revision"
+          value: "NuevaRevision"
+        - display: "Cerrar"
+          value: "Cerrar"
+        - display: "Profundizar riesgos"
+          value: "ProfundizarRiesgos"
+        - display: "Profundizar economico"
+          value: "ProfundizarEconomico"
+
+    - kind: ConditionGroup
+      id: route_after_delivery
+      conditions:
+        - id: cond_nueva_rev_delivery
+          condition: =Topic.AccionDespuesProfundizacion = "NuevaRevision"
+          actions:
+            - kind: BeginDialog
+              id: goto_reinicio_desde_delivery
+              dialog: crd3a_agente.topic.ReinicioControlado
+
+        - id: cond_riesgos_desde_delivery
+          condition: =Topic.AccionDespuesProfundizacion = "ProfundizarRiesgos"
+          actions:
+            - kind: BeginDialog
+              id: goto_riesgos_desde_delivery
+              dialog: crd3a_agente.topic.ProfundizarRiesgos
+
+        - id: cond_economico_desde_delivery
+          condition: =Topic.AccionDespuesProfundizacion = "ProfundizarEconomico"
+          actions:
+            - kind: BeginDialog
+              id: goto_economico_desde_delivery
+              dialog: crd3a_agente.topic.ProfundizarEconomico
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_cierre_desde_delivery
+          dialog: crd3a_agente.topic.CierreSeguro

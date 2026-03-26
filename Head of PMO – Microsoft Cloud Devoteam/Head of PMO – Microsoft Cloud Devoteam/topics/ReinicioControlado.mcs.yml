@@ -1,0 +1,66 @@
+mcs.metadata:
+  componentName: ReinicioControlado
+  description: Reinicio flexible sin perder control del flujo
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: ReinicioControlado
+    triggerQueries:
+      - nueva revision
+      - reiniciar
+      - cambiar foco
+
+  actions:
+    - kind: Question
+      id: ask_reinicio_type
+      alwaysPrompt: true
+      variable: Topic.TipoReinicio
+      prompt: Selecciona opcion
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Volver al menu"
+          value: "Menu"
+        - display: "Nueva revision"
+          value: "Nueva"
+        - display: "Cambiar foco"
+          value: "CambiarFoco"
+
+    - kind: ConditionGroup
+      id: route_reinicio
+      conditions:
+        - id: cond_volver_menu
+          condition: =Topic.TipoReinicio = "Menu"
+          actions:
+            - kind: BeginDialog
+              id: goto_menu_from_reinicio
+              dialog: crd3a_agente.topic.MainMenu
+
+        - id: cond_nueva_revision
+          condition: =Topic.TipoReinicio = "Nueva"
+          actions:
+            - kind: SetVariable
+              id: clear_modo_entrada
+              variable: Topic.ModoEntrada
+              value: ""
+            - kind: SetVariable
+              id: clear_contenido_pegado
+              variable: Topic.ContenidoPegado
+              value: ""
+            - kind: SetVariable
+              id: clear_nivel_analisis
+              variable: Topic.NivelAnalisis
+              value: ""
+            - kind: SetVariable
+              id: clear_tipo_revision
+              variable: Topic.TipoRevision
+              value: ""
+            - kind: BeginDialog
+              id: goto_menu_after_clean
+              dialog: crd3a_agente.topic.MainMenu
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_confirmar_alcance_cambio_foco
+          dialog: crd3a_agente.topic.ConfirmarAlcance

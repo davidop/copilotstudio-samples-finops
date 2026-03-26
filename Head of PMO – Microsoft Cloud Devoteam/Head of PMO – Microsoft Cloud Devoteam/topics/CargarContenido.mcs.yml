@@ -1,0 +1,333 @@
+mcs.metadata:
+  componentName: CargarContenido
+  description: Gestor de entrada PDF, texto pegado o formulario manual
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: CargarContenido
+    triggerQueries:
+      - cargar contenido
+      - adjuntar
+      - pegar contenido
+      - resumen manual
+
+  actions:
+    - kind: SetVariable
+      id: set_channel_id_early
+      variable: Global.CanalEntrada
+      value: =Lower(Text(System.Activity.ChannelId))
+
+    - kind: ConditionGroup
+      id: detect_attachment_presence_early
+      conditions:
+        - id: cond_has_attachments_payload_early
+          condition: =CountRows(System.Activity.Attachments) > 0
+          actions:
+            - kind: SetVariable
+              id: set_has_attachment_yes_early
+              variable: Global.HayAdjunto
+              value: "SI"
+
+      elseActions:
+        - kind: SetVariable
+          id: set_has_attachment_no_early
+          variable: Global.HayAdjunto
+          value: "NO"
+
+    - kind: SendActivity
+      id: send_intro
+      activity: |
+        Este paso sirve para cargar el contenido de la oferta y evaluarlo.
+
+        Si detecto un archivo adjunto, intentare analizarlo automaticamente sin pedirte mas pasos.
+        Si no hay adjunto o no puedo leerlo, te pedire un extracto o te ofrecere el formulario manual.
+
+        Recomendado incluir si esta disponible:
+        - Tipo de servicio del catalogo
+        - Alcance y exclusiones
+        - Modelo economico o baseline
+        - SLA, penalizaciones, riesgos y supuestos
+
+    - kind: ConditionGroup
+      id: capture_attachment_hint_from_message
+      conditions:
+        - id: cond_has_activity_text
+          condition: =Len(Text(System.Activity.Text)) > 0
+          actions:
+            - kind: SetVariable
+              id: set_global_attachment_name_hint
+              variable: Global.NombreArchivoAdjunto
+              value: =System.Activity.Text
+
+    - kind: ConditionGroup
+      id: auto_select_entry_mode
+      conditions:
+        - id: cond_auto_select_pdf_mode
+          condition: =Global.HayAdjunto = "SI"
+          actions:
+            - kind: SetVariable
+              id: set_entry_mode_pdf_automatic
+              variable: Topic.ModoEntrada
+              value: "PDF"
+
+            - kind: SendActivity
+              id: send_auto_select_pdf_mode
+              activity: He detectado un adjunto y voy a usar analisis automatico del documento.
+
+      elseActions:
+        - kind: Question
+          id: ask_entrada_mode
+          alwaysPrompt: true
+          variable: Topic.ModoEntrada
+          prompt: Selecciona como deseas proporcionar la informacion
+          entity: StringPrebuiltEntity
+          choices:
+            - display: "Adjuntar archivo (PDF/PPTX/DOCX)"
+              value: "PDF"
+            - display: "Pegar contenido"
+              value: "PegadoTexto"
+            - display: "Introducir manualmente"
+              value: "ManualStructured"
+
+    - kind: ConditionGroup
+      id: route_entrada
+      conditions:
+        - id: cond_pdf
+          condition: =Topic.ModoEntrada = "PDF"
+          actions:
+            - kind: SetVariable
+              id: set_attachment_type_unknown_default
+              variable: Global.TipoAdjuntoDetectado
+              value: "Desconocido"
+
+            - kind: ConditionGroup
+              id: detect_attachment_type_by_name
+              conditions:
+                - id: cond_attachment_type_pdf
+                  condition: =".pdf" in Lower(Text(System.Activity.Text))
+                  actions:
+                    - kind: SetVariable
+                      id: set_attachment_type_pdf
+                      variable: Global.TipoAdjuntoDetectado
+                      value: "PDF"
+
+                - id: cond_attachment_type_pptx
+                  condition: =".pptx" in Lower(Text(System.Activity.Text))
+                  actions:
+                    - kind: SetVariable
+                      id: set_attachment_type_pptx
+                      variable: Global.TipoAdjuntoDetectado
+                      value: "PPTX"
+
+                - id: cond_attachment_type_docx
+                  condition: =".docx" in Lower(Text(System.Activity.Text))
+                  actions:
+                    - kind: SetVariable
+                      id: set_attachment_type_docx
+                      variable: Global.TipoAdjuntoDetectado
+                      value: "DOCX"
+
+            - kind: SendActivity
+              id: send_pdf_instruction
+              activity: |
+                He detectado que quieres evaluar una oferta a partir de un documento.
+                Voy a intentar analizar el contenido del archivo automaticamente.
+
+            - kind: ConditionGroup
+              id: channel_specific_attachment_guidance
+              conditions:
+                - id: cond_channel_teams
+                  condition: ="teams" in Global.CanalEntrada
+                  actions:
+                    - kind: SendActivity
+                      id: send_teams_guidance
+                      activity: "Canal detectado: Teams. Si el archivo esta compartido por enlace y no como adjunto directo, pega tambien un extracto para asegurar la evaluacion."
+
+                - id: cond_channel_m365copilot
+                  condition: ="copilot" in Global.CanalEntrada
+                  actions:
+                    - kind: SendActivity
+                      id: send_m365copilot_guidance
+                      activity: "Canal detectado: Microsoft 365 Copilot. Voy a priorizar la lectura del adjunto y, si no hay contenido util, te pedire un extracto."
+
+            - kind: ConditionGroup
+              id: attachment_type_guidance
+              conditions:
+                - id: cond_attachment_supported_type
+                  condition: =Global.TipoAdjuntoDetectado = "PDF" Or Global.TipoAdjuntoDetectado = "PPTX" Or Global.TipoAdjuntoDetectado = "DOCX"
+                  actions:
+                    - kind: SendActivity
+                      id: send_attachment_type_detected
+                      activity: "Formato detectado: {Global.TipoAdjuntoDetectado}. Continuo con la evaluacion automatica del adjunto."
+
+              elseActions:
+                - kind: ConditionGroup
+                  id: attachment_unknown_type_guidance
+                  conditions:
+                    - id: cond_attachment_present_but_unknown_type
+                      condition: =Global.HayAdjunto = "SI"
+                      actions:
+                        - kind: SendActivity
+                          id: send_attachment_unknown_type
+                          activity: "No he podido identificar con precision el tipo de archivo. Formatos recomendados: PDF, PPTX o DOCX. Intentare analizarlo igualmente."
+
+            - kind: ConditionGroup
+              id: ensure_attachment_before_auto_analysis
+              conditions:
+                - id: cond_missing_attachment
+                  condition: =Global.HayAdjunto = "NO"
+                  actions:
+                    - kind: SendActivity
+                      id: send_no_attachment_detected
+                      activity: "No detecto un archivo adjunto en este mensaje. Adjunta el archivo y vuelve a enviarlo, o pega un extracto para continuar."
+
+                    - kind: Question
+                      id: ask_pdf_content_when_missing_attachment
+                      alwaysPrompt: true
+                      variable: Topic.ContenidoPegado
+                      prompt: Pega el contenido relevante del documento
+                      entity: StringPrebuiltEntity
+
+                    - kind: ConditionGroup
+                      id: check_missing_attachment_manual_content
+                      conditions:
+                        - id: cond_missing_attachment_manual_content_insufficient
+                          condition: =Len(Topic.ContenidoPegado) < 300 Or !("alcance" in Lower(Text(Topic.ContenidoPegado))) Or !(("coste" in Lower(Text(Topic.ContenidoPegado))) Or ("presupuesto" in Lower(Text(Topic.ContenidoPegado))) Or ("facturacion" in Lower(Text(Topic.ContenidoPegado)))) Or !(("riesgo" in Lower(Text(Topic.ContenidoPegado))) Or ("supuesto" in Lower(Text(Topic.ContenidoPegado))))
+                          actions:
+                            - kind: SetVariable
+                              id: set_missing_fields_no_attachment
+                              variable: Global.FaltantesDetectados
+                              value: "Incluye al menos: alcance, modelo economico (coste/presupuesto/facturacion) y riesgos/supuestos."
+
+                            - kind: BeginDialog
+                              id: goto_insufficient_from_no_attachment
+                              dialog: crd3a_agente.topic.InformacionInsuficiente
+
+                      elseActions:
+                        - kind: SetVariable
+                          id: set_global_tipo_proyecto_from_no_attachment_paste
+                          variable: Global.ResumenTipoProyecto
+                          value: =Topic.ContenidoPegado
+
+                        - kind: BeginDialog
+                          id: goto_confirmar_alcance_from_no_attachment_paste
+                          dialog: crd3a_agente.topic.ConfirmarAlcance
+
+            - kind: ConditionGroup
+              id: run_auto_analysis_when_attachment_present
+              conditions:
+                - id: cond_has_attachment_for_auto_analysis
+                  condition: =Global.HayAdjunto = "SI"
+                  actions:
+                    - kind: SearchAndSummarizeContent
+                      id: summarize_attached_file
+                      variable: Topic.ContenidoPegado
+                      userInput: =If(Len(Text(System.Activity.Text)) > 0, System.Activity.Text, "Analiza el archivo adjunto y extrae alcance, modelo economico, SLA, riesgos y supuestos")
+
+                    - kind: ConditionGroup
+                      id: check_attachment_analysis_result
+                      conditions:
+                        - id: cond_attachment_analysis_empty
+                          condition: =IsBlank(Topic.ContenidoPegado)
+                          actions:
+                            - kind: SendActivity
+                              id: send_attachment_analysis_failed
+                              activity: No he podido recuperar contenido util del adjunto. Para continuar, pega un extracto clave del documento.
+
+                            - kind: Question
+                              id: ask_pdf_extracted_content
+                              alwaysPrompt: true
+                              variable: Topic.ContenidoPegado
+                              prompt: Pega el contenido relevante del archivo adjunto
+                              entity: StringPrebuiltEntity
+
+                    - kind: ConditionGroup
+                      id: check_pdf_content_quality
+                      conditions:
+                        - id: cond_pdf_content_insufficient
+                          condition: =Len(Topic.ContenidoPegado) < 300 Or !("alcance" in Lower(Text(Topic.ContenidoPegado))) Or !(("coste" in Lower(Text(Topic.ContenidoPegado))) Or ("presupuesto" in Lower(Text(Topic.ContenidoPegado))) Or ("facturacion" in Lower(Text(Topic.ContenidoPegado)))) Or !(("riesgo" in Lower(Text(Topic.ContenidoPegado))) Or ("supuesto" in Lower(Text(Topic.ContenidoPegado))))
+                          actions:
+                            - kind: SetVariable
+                              id: set_missing_fields_pdf
+                              variable: Global.FaltantesDetectados
+                              value: "Incluye al menos: alcance, modelo economico (coste/presupuesto/facturacion) y riesgos/supuestos."
+
+                            - kind: SendActivity
+                              id: send_pdf_content_insufficient_warning
+                              activity: Informacion insuficiente para una validacion fiable. Te guiare para completar los datos minimos.
+
+                            - kind: BeginDialog
+                              id: goto_insufficient_from_pdf
+                              dialog: crd3a_agente.topic.InformacionInsuficiente
+
+                      elseActions:
+                        - kind: SendActivity
+                          id: send_pdf_content_received
+                          activity: Contenido del adjunto recibido y validado.
+
+                        - kind: SetVariable
+                          id: set_global_tipo_proyecto_from_pdf
+                          variable: Global.ResumenTipoProyecto
+                          value: =Topic.ContenidoPegado
+
+                        - kind: BeginDialog
+                          id: goto_confirmar_alcance_from_pdf
+                          dialog: crd3a_agente.topic.ConfirmarAlcance
+
+        - id: cond_pegado
+          condition: =Topic.ModoEntrada = "PegadoTexto"
+          actions:
+            - kind: SendActivity
+              id: send_paste_instruction
+              activity: Pega aqui el contenido de la propuesta, incluyendo categoria del servicio, alcance, modelo economico y riesgos.
+
+            - kind: Question
+              id: ask_pasted_content
+              alwaysPrompt: true
+              variable: Topic.ContenidoPegado
+              prompt: Pega el contenido
+              entity: StringPrebuiltEntity
+
+            - kind: ConditionGroup
+              id: check_content_quality
+              conditions:
+                - id: cond_content_insufficient
+                  condition: =Len(Topic.ContenidoPegado) < 300 Or !("alcance" in Lower(Text(Topic.ContenidoPegado))) Or !(("coste" in Lower(Text(Topic.ContenidoPegado))) Or ("presupuesto" in Lower(Text(Topic.ContenidoPegado))) Or ("facturacion" in Lower(Text(Topic.ContenidoPegado)))) Or !(("riesgo" in Lower(Text(Topic.ContenidoPegado))) Or ("supuesto" in Lower(Text(Topic.ContenidoPegado))))
+                  actions:
+                    - kind: SetVariable
+                      id: set_missing_fields_paste
+                      variable: Global.FaltantesDetectados
+                      value: "Incluye al menos: alcance, modelo economico (coste/presupuesto/facturacion) y riesgos/supuestos."
+
+                    - kind: SendActivity
+                      id: send_content_insufficient_warning
+                      activity: Informacion insuficiente para una validacion fiable. Te guiare para completar los datos minimos.
+
+                    - kind: BeginDialog
+                      id: goto_insufficient_from_paste
+                      dialog: crd3a_agente.topic.InformacionInsuficiente
+
+              elseActions:
+                - kind: SendActivity
+                  id: send_content_received
+                  activity: Contenido recibido y validado.
+
+                - kind: SetVariable
+                  id: set_global_tipo_proyecto_from_paste
+                  variable: Global.ResumenTipoProyecto
+                  value: =Topic.ContenidoPegado
+
+                - kind: BeginDialog
+                  id: goto_confirmar_alcance
+                  dialog: crd3a_agente.topic.ConfirmarAlcance
+
+      elseActions:
+        - kind: SendActivity
+          id: send_manual_intro
+          activity: Vamos a rellenar un resumen estructurado.
+
+        - kind: BeginDialog
+          id: goto_formulario_resumen
+          dialog: crd3a_agente.topic.FormularioResumen

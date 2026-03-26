@@ -1,0 +1,74 @@
+mcs.metadata:
+  componentName: MejorarOferta
+  description: Mejora o reescribe secciones de la propuesta
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: MejorarOferta
+    triggerQueries:
+      - mejorar oferta
+      - mejorar propuesta
+      - reescribir
+
+  actions:
+    - kind: Question
+      id: ask_aspect_mejorar
+      alwaysPrompt: true
+      variable: Topic.AspectoDeMejora
+      prompt: Que aspecto deseas mejorar segun estandares PMO?
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Resumen ejecutivo"
+          value: "ResumenEjecutivo"
+        - display: "Alcance"
+          value: "Alcance"
+        - display: "Riesgos"
+          value: "Riesgos"
+        - display: "Narrativa comercial y propuesta de valor"
+          value: "Narrativa"
+        - display: "Propuesta completa"
+          value: "Completa"
+
+    - kind: SendActivity
+      id: send_mejora_body
+      activity: "Sugerencia de mejora PMO: alinea la oferta con su categoria de servicio, usa la plantilla oficial vigente, refuerza calidad, planificacion/control, condiciones economicas y riesgos contractuales."
+
+    - kind: Question
+      id: ask_mejora_action
+      alwaysPrompt: true
+      variable: Topic.AccionDespuesMejora
+      prompt: Selecciona
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Guardar"
+          value: "Guardar"
+        - display: "Mejorar otro aspecto"
+          value: "OtraAspecto"
+        - display: "Nueva revision"
+          value: "NuevaRevision"
+        - display: "Cerrar"
+          value: "Cerrar"
+
+    - kind: ConditionGroup
+      id: route_after_mejora
+      conditions:
+        - id: cond_otra_aspecto
+          condition: =Topic.AccionDespuesMejora = "OtraAspecto"
+          actions:
+            - kind: BeginDialog
+              id: goto_mejorar_otra
+              dialog: crd3a_agente.topic.MejorarOferta
+
+        - id: cond_nueva_revision_mejora
+          condition: =Topic.AccionDespuesMejora = "NuevaRevision"
+          actions:
+            - kind: BeginDialog
+              id: goto_reinicio_desde_mejora
+              dialog: crd3a_agente.topic.ReinicioControlado
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_cierre_desde_mejora
+          dialog: crd3a_agente.topic.CierreSeguro

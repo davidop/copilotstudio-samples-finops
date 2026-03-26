@@ -1,0 +1,54 @@
+mcs.metadata:
+  componentName: Varios temas relacionados
+  description: Resolucion de ambiguedad de intenciones
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnSelectIntent
+  id: main
+  triggerBehavior: Always
+  actions:
+    - kind: SendActivity
+      id: send_ambiguity_header
+      activity: He detectado varias intenciones posibles. Selecciona una.
+
+    - kind: SetVariable
+      id: set_intent_options
+      variable: Topic.IntentOptions
+      value: =System.Recognizer.IntentOptions
+
+    - kind: SetTextVariable
+      id: set_none_label
+      variable: Topic.NoneOfTheseDisplayName
+      value: Ninguna de estas opciones
+
+    - kind: EditTable
+      id: add_none_option
+      changeType: Add
+      itemsVariable: Topic.IntentOptions
+      value: "={ DisplayName: Topic.NoneOfTheseDisplayName, TopicId: \"NoTopic\", TriggerId: \"NoTrigger\", Score: 1.0 }"
+
+    - kind: Question
+      id: ask_clarify_intent
+      interruptionPolicy:
+        allowInterruption: false
+      alwaysPrompt: true
+      variable: System.Recognizer.SelectedIntent
+      prompt: Selecciona la intencion correcta
+      entity:
+        kind: DynamicClosedListEntity
+        items: =Topic.IntentOptions
+
+    - kind: ConditionGroup
+      id: route_disambiguated
+      conditions:
+        - id: cond_none
+          condition: =System.Recognizer.SelectedIntent.TopicId = "NoTopic"
+          actions:
+            - kind: BeginDialog
+              id: goto_fallback_from_disambig
+              dialog: crd3a_agente.topic.Fallback
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_selected_topic
+          dialog: =System.Recognizer.SelectedIntent.TopicId

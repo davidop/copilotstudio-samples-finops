@@ -1,0 +1,45 @@
+mcs.metadata:
+  componentName: Inicio de la conversación
+  description: Home screen personalizado - Presentación como Head of PMO, no saludo genérico
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: ConditionGroup
+      id: route_conversation_start
+      conditions:
+        - id: cond_start_with_attachment
+          condition: =CountRows(System.Activity.Attachments) > 0
+          actions:
+            - kind: SendActivity
+              id: send_attachment_first_welcome
+              activity: |
+                **Head of PMO – Microsoft Cloud | Devoteam**
+
+                He detectado un documento adjunto. Voy a analizarlo automaticamente y devolverte un dictamen PMO con bloqueadores, acciones inmediatas y trazabilidad.
+            - kind: BeginDialog
+              id: goto_cargar_contenido_from_attachment
+              dialog: crd3a_agente.topic.CargarContenido
+
+      elseActions:
+        - kind: SendActivity
+          id: send_welcome
+          activity: |
+            **Head of PMO – Microsoft Cloud | Devoteam**
+
+            Soy el asistente de evaluacion PMO para ofertas de preventa Microsoft Cloud.
+
+            Mi caso principal es recibir un documento de oferta, analizarlo y devolverte un dictamen PMO accionable.
+
+            Puedes empezar de tres formas:
+            - Adjunta un documento en PDF, PPTX o DOCX para analisis automatico.
+            - Pega un extracto del contenido.
+            - Accede al menu si quieres una revision guiada o una mejora concreta.
+
+            Referencia activa PMO Intranet:
+            https://sites.google.com/devoteam.com/es-intranet/conoce-a-devoteam-spain/nuestras-ofertas-experiencia/pmo
+
+        - kind: BeginDialog
+          id: goto_mainmenu
+          dialog: crd3a_agente.topic.MainMenu

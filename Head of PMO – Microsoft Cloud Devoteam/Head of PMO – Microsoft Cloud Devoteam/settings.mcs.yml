@@ -1,0 +1,41 @@
+﻿displayName: Head of PMO – Microsoft Cloud Devoteam
+schemaName: crd3a_agente
+accessControlPolicy: ChatbotReaders
+authenticationMode: Integrated
+authenticationTrigger: Always
+configuration:
+  channels:
+    - channelId: MsTeams
+
+    - channelId: Microsoft365Copilot
+
+  settings:
+    GenerativeActionsEnabled: true
+
+  publishOnImport: true
+  gPTSettings:
+    defaultSchemaName: crd3a_agente.gpt.default
+
+  isLightweightBot: false
+  aISettings:
+    useModelKnowledge: true
+    isFileAnalysisEnabled: true
+    isSemanticSearchEnabled: true
+    optInUseLatestModels: false
+
+  recognizer:
+    kind: GenerativeAIRecognizer
+
+  starterPrompts:
+    - description: Adjunta tu documento de oferta en PDF, PPTX o DOCX y recibirás un dictamen PMO completo con bloqueadores principales, riesgos clave con su mitigación, acciones inmediatas priorizadas, score de calidad 0-100 y trazabilidad del tipo de servicio detectado.
+      title: Analizar oferta adjunta
+
+    - description: ¿Quieres que me centre en los riesgos y bloqueadores críticos de una propuesta antes de enviarla al cliente? Adjunta o pega el contenido de la oferta y analizo riesgos contractuales, SLA con exposición legal, dependencias críticas sin control y ambigüedades de alcance.
+      title: Revisar riesgos y bloqueadores
+
+    - description: Comparte tu oferta y te doy recomendaciones concretas y priorizadas para mejorar la coherencia económica, la viabilidad del delivery y el alineamiento con los estándares Microsoft-Devoteam antes de presentarla al cliente.
+      title: Mejorar oferta antes del envío
+
+publishedOn: 2026-03-25T20:56:27.0000000Z
+template: default-2.1.0
+language: 1034

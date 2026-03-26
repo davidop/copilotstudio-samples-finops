@@ -1,0 +1,340 @@
+mcs.metadata:
+  componentName: Validar oferta
+  description: Motor central de validacion PMO
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Validar oferta
+    triggerQueries:
+      - validar oferta
+      - revisar propuesta
+      - analizar oferta
+
+  actions:
+    - kind: SendActivity
+      id: send_analyzing
+      activity: Analizando oferta con criterios del Catalogo PMO DEVOTEAM Espana 2025.
+
+    - kind: SetVariable
+      id: clear_tipo_servicio_pmo
+      variable: Topic.TipoServicioPMO
+      value: ""
+
+    - kind: SetVariable
+      id: set_detection_mode_default
+      variable: Global.ModoDeteccionTipoServicio
+      value: "Manual"
+
+    - kind: SetVariable
+      id: set_detection_confidence_default
+      variable: Global.ConfianzaDeteccion
+      value: "Baja"
+
+    - kind: SetVariable
+      id: set_resumen_normalizado
+      variable: Topic.ResumenNormalizado
+      value: =Lower(Text(Global.ResumenTipoProyecto))
+
+    - kind: SetVariable
+      id: set_nombre_archivo_normalizado
+      variable: Topic.NombreArchivoNormalizado
+      value: =Lower(Text(Global.NombreArchivoAdjunto))
+
+    - kind: ConditionGroup
+      id: detect_tipo_servicio_desde_resumen
+      conditions:
+        - id: cond_detect_soporte_strong
+          condition: =Topic.TipoServicioPMO = "" And (("soporte" in Topic.ResumenNormalizado) Or ("mantenimiento" in Topic.ResumenNormalizado) Or ("help desk" in Topic.ResumenNormalizado) Or ("service desk" in Topic.ResumenNormalizado) Or ("incidencia" in Topic.ResumenNormalizado) Or ("ticket" in Topic.ResumenNormalizado) Or ("sla" in Topic.ResumenNormalizado) Or ("run" in Topic.ResumenNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_soporte_detectado_strong
+              variable: Topic.TipoServicioPMO
+              value: "SoporteMantenimiento"
+            - kind: SetVariable
+              id: set_detection_mode_auto_soporte_strong
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_soporte_strong
+              variable: Global.ConfianzaDeteccion
+              value: "Alta"
+
+        - id: cond_detect_bolsa_strong
+          condition: =Topic.TipoServicioPMO = "" And (("bolsa" in Topic.ResumenNormalizado) Or ("banco de horas" in Topic.ResumenNormalizado) Or ("horas" in Topic.ResumenNormalizado) Or ("time and material" in Topic.ResumenNormalizado) Or ("t&m" in Topic.ResumenNormalizado) Or ("consumo" in Topic.ResumenNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_bolsa_detectado_strong
+              variable: Topic.TipoServicioPMO
+              value: "BolsaHoras"
+            - kind: SetVariable
+              id: set_detection_mode_auto_bolsa_strong
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_bolsa_strong
+              variable: Global.ConfianzaDeteccion
+              value: "Alta"
+
+        - id: cond_detect_agile_strong
+          condition: =Topic.TipoServicioPMO = "" And (("agile" in Topic.ResumenNormalizado) Or ("sprint" in Topic.ResumenNormalizado) Or ("scrum" in Topic.ResumenNormalizado) Or ("kanban" in Topic.ResumenNormalizado) Or ("backlog" in Topic.ResumenNormalizado) Or ("squad" in Topic.ResumenNormalizado) Or ("velocity" in Topic.ResumenNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_agile_detectado_strong
+              variable: Topic.TipoServicioPMO
+              value: "TeamAgile"
+            - kind: SetVariable
+              id: set_detection_mode_auto_agile_strong
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_agile_strong
+              variable: Global.ConfianzaDeteccion
+              value: "Alta"
+
+        - id: cond_detect_proyecto_strong
+          condition: =Topic.TipoServicioPMO = "" And (("proyecto" in Topic.ResumenNormalizado) Or ("cerrado" in Topic.ResumenNormalizado) Or ("evolutivo" in Topic.ResumenNormalizado) Or ("fixed price" in Topic.ResumenNormalizado) Or ("alcance cerrado" in Topic.ResumenNormalizado) Or ("hito" in Topic.ResumenNormalizado) Or ("milestone" in Topic.ResumenNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_proyecto_detectado_strong
+              variable: Topic.TipoServicioPMO
+              value: "ProyectoCerradoEvolutivo"
+            - kind: SetVariable
+              id: set_detection_mode_auto_proyecto_strong
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_proyecto_strong
+              variable: Global.ConfianzaDeteccion
+              value: "Alta"
+
+        - id: cond_detect_consultoria_strong
+          condition: =Topic.TipoServicioPMO = "" And (("consultoria" in Topic.ResumenNormalizado) Or ("adopcion" in Topic.ResumenNormalizado) Or ("cambio" in Topic.ResumenNormalizado) Or ("consulting" in Topic.ResumenNormalizado) Or ("advisory" in Topic.ResumenNormalizado) Or ("change management" in Topic.ResumenNormalizado) Or ("enablement" in Topic.ResumenNormalizado) Or ("workshop" in Topic.ResumenNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_consultoria_detectado_strong
+              variable: Topic.TipoServicioPMO
+              value: "ConsultoriaAdopcion"
+            - kind: SetVariable
+              id: set_detection_mode_auto_consultoria_strong
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_consultoria_strong
+              variable: Global.ConfianzaDeteccion
+              value: "Alta"
+
+        - id: cond_detect_soporte_filename
+          condition: =Topic.TipoServicioPMO = "" And (("soporte" in Topic.NombreArchivoNormalizado) Or ("mantenimiento" in Topic.NombreArchivoNormalizado) Or ("helpdesk" in Topic.NombreArchivoNormalizado) Or ("service-desk" in Topic.NombreArchivoNormalizado) Or ("service_desk" in Topic.NombreArchivoNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_soporte_detectado_filename
+              variable: Topic.TipoServicioPMO
+              value: "SoporteMantenimiento"
+            - kind: SetVariable
+              id: set_detection_mode_auto_soporte_filename
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_soporte_filename
+              variable: Global.ConfianzaDeteccion
+              value: "Media"
+
+        - id: cond_detect_bolsa_filename
+          condition: =Topic.TipoServicioPMO = "" And (("bolsa" in Topic.NombreArchivoNormalizado) Or ("horas" in Topic.NombreArchivoNormalizado) Or ("hours" in Topic.NombreArchivoNormalizado) Or ("tm" in Topic.NombreArchivoNormalizado) Or ("time-material" in Topic.NombreArchivoNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_bolsa_detectado_filename
+              variable: Topic.TipoServicioPMO
+              value: "BolsaHoras"
+            - kind: SetVariable
+              id: set_detection_mode_auto_bolsa_filename
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_bolsa_filename
+              variable: Global.ConfianzaDeteccion
+              value: "Media"
+
+        - id: cond_detect_agile_filename
+          condition: =Topic.TipoServicioPMO = "" And (("agile" in Topic.NombreArchivoNormalizado) Or ("sprint" in Topic.NombreArchivoNormalizado) Or ("scrum" in Topic.NombreArchivoNormalizado) Or ("backlog" in Topic.NombreArchivoNormalizado) Or ("squad" in Topic.NombreArchivoNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_agile_detectado_filename
+              variable: Topic.TipoServicioPMO
+              value: "TeamAgile"
+            - kind: SetVariable
+              id: set_detection_mode_auto_agile_filename
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_agile_filename
+              variable: Global.ConfianzaDeteccion
+              value: "Media"
+
+        - id: cond_detect_proyecto_filename
+          condition: =Topic.TipoServicioPMO = "" And (("proyecto" in Topic.NombreArchivoNormalizado) Or ("cerrado" in Topic.NombreArchivoNormalizado) Or ("evolutivo" in Topic.NombreArchivoNormalizado) Or ("fixed" in Topic.NombreArchivoNormalizado) Or ("milestone" in Topic.NombreArchivoNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_proyecto_detectado_filename
+              variable: Topic.TipoServicioPMO
+              value: "ProyectoCerradoEvolutivo"
+            - kind: SetVariable
+              id: set_detection_mode_auto_proyecto_filename
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_proyecto_filename
+              variable: Global.ConfianzaDeteccion
+              value: "Media"
+
+        - id: cond_detect_consultoria_filename
+          condition: =Topic.TipoServicioPMO = "" And (("consultoria" in Topic.NombreArchivoNormalizado) Or ("consulting" in Topic.NombreArchivoNormalizado) Or ("adopcion" in Topic.NombreArchivoNormalizado) Or ("adoption" in Topic.NombreArchivoNormalizado) Or ("cambio" in Topic.NombreArchivoNormalizado) Or ("change" in Topic.NombreArchivoNormalizado))
+          actions:
+            - kind: SetVariable
+              id: set_tipo_consultoria_detectado_filename
+              variable: Topic.TipoServicioPMO
+              value: "ConsultoriaAdopcion"
+            - kind: SetVariable
+              id: set_detection_mode_auto_consultoria_filename
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Automatica"
+            - kind: SetVariable
+              id: set_detection_confidence_auto_consultoria_filename
+              variable: Global.ConfianzaDeteccion
+              value: "Media"
+
+      elseActions:
+        - kind: SendActivity
+          id: send_no_detection
+          activity: No se ha detectado automaticamente el tipo de servicio con suficiente evidencia.
+
+    - kind: ConditionGroup
+      id: ask_tipo_only_if_needed
+      conditions:
+        - id: cond_tipo_not_detected
+          condition: =Topic.TipoServicioPMO = ""
+          actions:
+            - kind: Question
+              id: ask_tipo_servicio_pmo
+              alwaysPrompt: true
+              variable: Topic.TipoServicioPMO
+              prompt: Selecciona el tipo de servicio a validar
+              entity: StringPrebuiltEntity
+              choices:
+                - display: "Soporte y Mantenimiento"
+                  value: "SoporteMantenimiento"
+                - display: "Bolsa de Horas"
+                  value: "BolsaHoras"
+                - display: "Team Agile"
+                  value: "TeamAgile"
+                - display: "Proyecto Cerrado o Evolutivo"
+                  value: "ProyectoCerradoEvolutivo"
+                - display: "Consultoria / Adopcion y Gestion del Cambio"
+                  value: "ConsultoriaAdopcion"
+                - display: "Otro servicio del catalogo"
+                  value: "Otro"
+            - kind: SetVariable
+              id: set_detection_mode_manual_choice
+              variable: Global.ModoDeteccionTipoServicio
+              value: "Manual"
+            - kind: SetVariable
+              id: set_detection_confidence_manual_choice
+              variable: Global.ConfianzaDeteccion
+              value: "Media"
+
+      elseActions:
+        - kind: SendActivity
+          id: send_tipo_detected
+          activity: "Tipo de servicio detectado automaticamente: {Topic.TipoServicioPMO} (confianza {Global.ConfianzaDeteccion})"
+
+    - kind: ConditionGroup
+      id: route_tipo_servicio
+      conditions:
+        - id: cond_soporte_mantenimiento
+          condition: =Topic.TipoServicioPMO = "SoporteMantenimiento"
+          actions:
+            - kind: SetVariable
+              id: set_resultado_soporte
+              variable: Global.ResultadoValidacion
+              value: "VALIDACION PMO - SOPORTE Y MANTENIMIENTO\n1) Baseline definido (+1.5 FTE cuando aplique).\n2) Responsable de Servicio identificado.\n3) Canales de contacto y clasificacion de incidencias/peticiones descritos.\n4) SLA (respuesta/resolucion/workaround) y seguimiento operativo definidos.\n5) Facturacion fija mensual y condiciones de evolutivos aclaradas.\n6) Riesgos operativos y mitigaciones documentados.\nDictamen: Requiere Cambios si falta baseline, SLA o responsable."
+
+        - id: cond_bolsa_horas
+          condition: =Topic.TipoServicioPMO = "BolsaHoras"
+          actions:
+            - kind: SetVariable
+              id: set_resultado_bolsa
+              variable: Global.ResultadoValidacion
+              value: "VALIDACION PMO - BOLSA DE HORAS\n1) Limite de horas contratado y caducidad definidos.\n2) Facturacion anticipada total de la bolsa especificada.\n3) Sin baseline: modelo bajo demanda explicitado.\n4) Responsable de Servicio asignado.\n5) Priorizacion operativa y dependencias cliente documentadas.\n6) Riesgos de consumo/no consumo y reglas de uso incluidas.\nDictamen: Requiere Cambios si faltan caducidad, reglas de consumo o facturacion."
+
+        - id: cond_team_agile
+          condition: =Topic.TipoServicioPMO = "TeamAgile"
+          actions:
+            - kind: SetVariable
+              id: set_resultado_agile
+              variable: Global.ResultadoValidacion
+              value: "VALIDACION PMO - TEAM AGILE\n1) Product Backlog inicial definido y priorizacion con cliente clarificada.\n2) Minimo de sprints contratados y cadencia acordada.\n3) Baseline = equipo completo; capacidad por sprint coherente.\n4) Facturacion fija por sprint/mensual indicada.\n5) Roles y responsabilidades (PO, SM/lead, equipo) documentados.\n6) KPI de valor y riesgos de alcance abiertos controlados.\nDictamen: Requiere Cambios si no hay backlog gobernado o capacidad trazable."
+
+        - id: cond_proyecto_cerrado
+          condition: =Topic.TipoServicioPMO = "ProyectoCerradoEvolutivo"
+          actions:
+            - kind: SetVariable
+              id: set_resultado_proyecto
+              variable: Global.ResultadoValidacion
+              value: "VALIDACION PMO - PROYECTO CERRADO / EVOLUTIVO\n1) Alcance funcional/no funcional acotado y consensuado.\n2) Coste cerrado y fecha compromiso explicitados.\n3) Gestion de cambios de alcance definida (proceso e impacto).\n4) Planificacion, hitos y criterios de aceptacion completos.\n5) Riesgos de plazo/coste con mitigacion y owner.\n6) Calidad y entregables de control PMO incluidos.\nDictamen: Requiere Cambios si alcance, hitos o gestion de cambios no estan cerrados."
+
+        - id: cond_consultoria_adopcion
+          condition: =Topic.TipoServicioPMO = "ConsultoriaAdopcion"
+          actions:
+            - kind: SetVariable
+              id: set_resultado_consultoria
+              variable: Global.ResultadoValidacion
+              value: "VALIDACION PMO - CONSULTORIA / ADOPCION Y CAMBIO\n1) AS-IS/TO-BE definidos y trazables.\n2) Plan de comunicacion, formacion y acompanamiento descrito.\n3) Entregables de adopcion (materiales, webinars, soporte cambio) incluidos.\n4) Modelo de gobierno y responsabilidades cliente-proveedor claros.\n5) KPI de adopcion y medicion de impacto establecidos.\n6) Riesgos de resistencia al cambio y mitigaciones explicitados.\nDictamen: Requiere Cambios si faltan KPI o plan de cambio ejecutable."
+
+      elseActions:
+        - kind: SetVariable
+          id: set_resultado_generico
+          variable: Global.ResultadoValidacion
+          value: "VALIDACION PMO - SERVICIO DEL CATALOGO\n1) Categoria de servicio confirmada en catalogo PMO.\n2) Plantilla oficial correcta (ES/EN - Google/Microsoft).\n3) Seccion de Calidad y, cuando aplique, Planificacion y Control completadas.\n4) Modelo economico (baseline/fija/variable) y supuestos claros.\n5) Delivery/staffing y responsable de servicio/proyecto definidos.\n6) Riesgos, SLA y penalizaciones documentados.\nDictamen: Requiere Cambios hasta cerrar huecos de control contractual y operativo."
+
+    - kind: SetVariable
+      id: set_global_tipo_servicio_final
+      variable: Global.TipoServicioPMOSeleccionado
+      value: =Topic.TipoServicioPMO
+
+    - kind: SetVariable
+      id: set_summary_dictamen
+      variable: Global.DictamenEstandar
+      value: "Requiere cambios antes de envio al cliente"
+
+    - kind: SetVariable
+      id: set_summary_bloqueadores
+      variable: Global.BloqueadoresEstandar
+      value: "Cerrar alcance funcional/no funcional, confirmar modelo economico y explicitar riesgos/supuestos criticos."
+
+    - kind: SetVariable
+      id: set_summary_actions
+      variable: Global.AccionesInmediatas
+      value: "1) Completar huecos de alcance y exclusiones. 2) Validar baseline/coste/SLA con responsables. 3) Revalidar oferta en esta herramienta."
+
+    - kind: ConditionGroup
+      id: set_quality_score
+      conditions:
+        - id: cond_quality_auto
+          condition: =Global.ModoDeteccionTipoServicio = "Automatica"
+          actions:
+            - kind: SetVariable
+              id: set_quality_score_auto
+              variable: Global.ScoreCalidadEstimado
+              value: "80/100"
+
+      elseActions:
+        - kind: SetVariable
+          id: set_quality_score_manual
+          variable: Global.ScoreCalidadEstimado
+          value: "65/100"
+
+    - kind: BeginDialog
+      id: goto_mostrar_resultado
+      dialog: crd3a_agente.topic.MostrarResultado

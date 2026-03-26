@@ -1,0 +1,78 @@
+mcs.metadata:
+  componentName: MainMenu
+  description: Menu principal guiado con opciones de validacion
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: MainMenu
+    triggerQueries:
+      - menu
+      - menu principal
+      - opciones
+      - volver al menu
+      - inicio
+
+  actions:
+    - kind: ConditionGroup
+      id: route_main_menu
+      conditions:
+        - id: cond_menu_with_attachment
+          condition: =CountRows(System.Activity.Attachments) > 0
+          actions:
+            - kind: SendActivity
+              id: send_menu_attachment_shortcut
+              activity: He detectado un adjunto. Priorizaré su analisis automatico sin pasar por seleccion manual.
+
+            - kind: BeginDialog
+              id: goto_cargar_contenido_from_menu_attachment
+              dialog: crd3a_agente.topic.CargarContenido
+
+      elseActions:
+        - kind: SendActivity
+          id: send_menu_title
+          activity: |
+            El uso principal de este agente es analizar un documento de oferta y devolverte un dictamen PMO.
+
+            Si ya tienes un archivo, adjuntalo para continuar automaticamente.
+            Si no, selecciona una opcion:
+
+            - Validar una oferta completa
+            - Revisar riesgos y SLA
+            - Revisar delivery y staffing
+            - Revisar modelo economico
+            - Mejorar propuesta antes de envio
+
+        - kind: Question
+          id: ask_menu_choice
+          alwaysPrompt: true
+          variable: Topic.TipoRevision
+          prompt: Elige el tipo de analisis
+          entity: StringPrebuiltEntity
+          choices:
+            - display: "Validar oferta completa (segun Catalogo PMO)"
+              value: "ValidarCompleto"
+            - display: "Revisar riesgos, SLA y supuestos contractuales"
+              value: "Riesgos"
+            - display: "Revisar delivery, staffing y modelo operativo"
+              value: "Delivery"
+            - display: "Revisar modelo economico (baseline, variable, horas)"
+              value: "Economico"
+            - display: "Mejorar propuesta (estructura PMO)"
+              value: "Mejorar"
+
+        - kind: ConditionGroup
+          id: route_selection
+          conditions:
+            - id: cond_mejorar
+              condition: =Topic.TipoRevision = "Mejorar"
+              actions:
+                - kind: BeginDialog
+                  id: goto_mejorar_oferta
+                  dialog: crd3a_agente.topic.MejorarOferta
+
+          elseActions:
+            - kind: BeginDialog
+              id: goto_cargar_contenido
+              dialog: crd3a_agente.topic.CargarContenido

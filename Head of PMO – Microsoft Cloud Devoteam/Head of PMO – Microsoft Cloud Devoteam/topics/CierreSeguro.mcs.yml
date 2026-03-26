@@ -1,0 +1,22 @@
+mcs.metadata:
+  componentName: CierreSeguro
+  description: Cierre profesional de sesion
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: CierreSeguro
+    triggerQueries:
+      - cerrar
+      - fin
+      - adios
+      - terminar
+
+  actions:
+    - kind: SendActivity
+      id: send_cierre_final
+      activity: Sesion cerrada. Gracias por usar el asistente PMO.
+
+    - kind: EndDialog
+      id: end_dialog

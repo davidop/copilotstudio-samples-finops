@@ -1,5 +1,6 @@
-# Name: Microsoft 365 Licensing and Pricing
-# Official Microsoft documentation for Microsoft 365, covering licensing plans, pricing, subscriptions, and service descriptions.
+mcs.metadata:
+  componentName: Microsoft 365 Licensing and Pricing
+  description: Official Microsoft documentation for Microsoft 365, covering licensing plans, pricing, subscriptions, and service descriptions.
 kind: KnowledgeSourceConfiguration
 source:
   kind: PublicSiteSearchSource

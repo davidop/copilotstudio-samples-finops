@@ -1,5 +1,6 @@
-# Name: FinOps with Azure
-# Official Microsoft documentation for FinOps practices with Azure, covering FinOps framework implementation, cost optimization strategies, and cloud financial management.
+mcs.metadata:
+  componentName: FinOps with Azure
+  description: Official Microsoft documentation for FinOps practices with Azure, covering FinOps framework implementation, cost optimization strategies, and cloud financial management.
 kind: KnowledgeSourceConfiguration
 source:
   kind: PublicSiteSearchSource

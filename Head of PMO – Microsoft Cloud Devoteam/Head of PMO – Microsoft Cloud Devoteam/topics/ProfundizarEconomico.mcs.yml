@@ -1,0 +1,62 @@
+mcs.metadata:
+  componentName: ProfundizarEconomico
+  description: Analisis detallado del modelo economico
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: ProfundizarEconomico
+    triggerQueries:
+      - profundizar economico
+      - modelo economico
+
+  actions:
+    - kind: SendActivity
+      id: send_economico_body
+      activity: "Profundizacion economica PMO: valida baseline, facturacion fija/variable, bolsa de horas, extras, supuestos de coste y consistencia esfuerzo-precio."
+
+    - kind: Question
+      id: ask_economico_action
+      alwaysPrompt: true
+      variable: Topic.AccionDespuesProfundizacion
+      prompt: Selecciona
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Nueva revision"
+          value: "NuevaRevision"
+        - display: "Cerrar"
+          value: "Cerrar"
+        - display: "Profundizar riesgos"
+          value: "ProfundizarRiesgos"
+        - display: "Profundizar delivery"
+          value: "ProfundizarDelivery"
+
+    - kind: ConditionGroup
+      id: route_after_economico
+      conditions:
+        - id: cond_nueva_rev_economico
+          condition: =Topic.AccionDespuesProfundizacion = "NuevaRevision"
+          actions:
+            - kind: BeginDialog
+              id: goto_reinicio_desde_economico
+              dialog: crd3a_agente.topic.ReinicioControlado
+
+        - id: cond_riesgos_desde_economico
+          condition: =Topic.AccionDespuesProfundizacion = "ProfundizarRiesgos"
+          actions:
+            - kind: BeginDialog
+              id: goto_riesgos_desde_economico
+              dialog: crd3a_agente.topic.ProfundizarRiesgos
+
+        - id: cond_delivery_desde_economico
+          condition: =Topic.AccionDespuesProfundizacion = "ProfundizarDelivery"
+          actions:
+            - kind: BeginDialog
+              id: goto_delivery_desde_economico
+              dialog: crd3a_agente.topic.ProfundizarDeliveryStaffing
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_cierre_desde_economico
+          dialog: crd3a_agente.topic.CierreSeguro

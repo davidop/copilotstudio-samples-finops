@@ -1,5 +1,6 @@
-# Name: FinOps Agent
-# A FinOps advisor agent grounded in Microsoft Learn documentation for Azure, M365, Copilot, and Microsoft Foundry cost management.
+mcs.metadata:
+  componentName: FinOps Agent
+  description: A FinOps advisor agent grounded in Microsoft Learn documentation for Azure, M365, Copilot, and Microsoft Foundry cost management.
 kind: GptComponentMetadata
 displayName: FinOps Agent
 instructions: |-

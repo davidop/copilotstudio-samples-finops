@@ -1,0 +1,25 @@
+{"id":"HP-01","conjunto":"HappyPath","input":"Quiero validar una oferta completa","expected":{"route":"MainMenu->CargarContenido","must_include":["Validar oferta completa"]}}
+{"id":"HP-02","conjunto":"HappyPath","input":"Es un servicio de soporte y mantenimiento con SLA y baseline","expected":{"service_type":"SoporteMantenimiento","must_include":["detectado automaticamente"]}}
+{"id":"HP-03","conjunto":"HappyPath","input":"Oferta de bolsa de horas para evolutivos","expected":{"service_type":"BolsaHoras","must_include":["bolsa de horas"]}}
+{"id":"HP-04","conjunto":"HappyPath","input":"Propuesta de team agile por sprints con backlog","expected":{"service_type":"TeamAgile","must_include":["team agile"]}}
+{"id":"HP-05","conjunto":"HappyPath","input":"Proyecto cerrado con alcance y fecha de entrega","expected":{"service_type":"ProyectoCerradoEvolutivo","must_include":["proyecto cerrado"]}}
+{"id":"HP-06","conjunto":"HappyPath","input":"Servicio de consultoria y adopcion con plan de cambio","expected":{"service_type":"ConsultoriaAdopcion","must_include":["consultoria"]}}
+{"id":"HP-07","conjunto":"HappyPath","input":"Mostrar resultado","expected":{"route":"MostrarResultado","must_include":["Trazabilidad: tipo de servicio"]}}
+{"id":"EP-01","conjunto":"ErrorPath","input":"Solo tengo un resumen de dos lineas","expected":{"route":"InformacionInsuficiente","must_include":["Falta informacion"]}}
+{"id":"EP-02","conjunto":"ErrorPath","input":"El pdf no funciona","expected":{"route":"ErrorAdjunto","must_include":["Elige una alternativa"]}}
+{"id":"EP-03","conjunto":"ErrorPath","input":"Ha ocurrido un error","expected":{"route":"OnError","must_include":["Cual prefieres"]}}
+{"id":"EP-04","conjunto":"ErrorPath","input":"asdf qwer zzzz","expected":{"route":"Fallback","must_include":["menu"]}}
+{"id":"EP-05","conjunto":"ErrorPath","input":"Quiero revisar y mejorar oferta","expected":{"route":"MultipleTopicsMatched","must_include":["Selecciona la intencion correcta"]}}
+{"id":"REG-01","conjunto":"Regresion","input":"Quiero nueva revision","expected":{"route":"ReinicioControlado","must_include":["Nueva revision"]}}
+{"id":"REG-02","conjunto":"Regresion","input":"Cerrar sesion","expected":{"route":"CierreSeguro","must_include":["Sesion cerrada"]}}
+{"id":"REG-03","conjunto":"Regresion","input":"Mejora esta propuesta","expected":{"route":"MejorarOferta","must_include":["Que aspecto deseas mejorar"]}}
+{"id":"HP-08","conjunto":"HappyPath","input":"Servicio gestionado tipo help desk con tickets y SLA","expected":{"service_type":"SoporteMantenimiento","must_include":["SoporteMantenimiento","confianza Alta"]}}
+{"id":"HP-09","conjunto":"HappyPath","input":"Modelo time and material con consumo de horas mensual","expected":{"service_type":"BolsaHoras","must_include":["BolsaHoras","confianza Alta"]}}
+{"id":"HP-10","conjunto":"HappyPath","input":"Squad scrum con velocity y backlog priorizado","expected":{"service_type":"TeamAgile","must_include":["TeamAgile","confianza Alta"]}}
+{"id":"HP-11","conjunto":"HappyPath","input":"Fixed price con milestones y alcance cerrado","expected":{"service_type":"ProyectoCerradoEvolutivo","must_include":["ProyectoCerradoEvolutivo","confianza Alta"]}}
+{"id":"HP-12","conjunto":"HappyPath","input":"Advisory con workshop y change management para adopcion","expected":{"service_type":"ConsultoriaAdopcion","must_include":["ConsultoriaAdopcion","confianza Alta"]}}
+{"id":"HP-13","conjunto":"HappyPath","input":"Adjunto oferta_service-desk_operacion_v3.docx","expected":{"service_type":"SoporteMantenimiento","must_include":["SoporteMantenimiento","confianza Media"]}}
+{"id":"HP-14","conjunto":"HappyPath","input":"Adjunto propuesta_time-material_2026.pdf","expected":{"service_type":"BolsaHoras","must_include":["BolsaHoras","confianza Media"]}}
+{"id":"HP-15","conjunto":"HappyPath","input":"Adjunto team_agile_backlog_sprint5.pptx","expected":{"service_type":"TeamAgile","must_include":["TeamAgile","confianza Media"]}}
+{"id":"HP-16","conjunto":"HappyPath","input":"Adjunto fixed_price_milestone_plan_v1.docx","expected":{"service_type":"ProyectoCerradoEvolutivo","must_include":["ProyectoCerradoEvolutivo","confianza Media"]}}
+{"id":"HP-17","conjunto":"HappyPath","input":"Adjunto consulting_change_adoption_pack.pdf","expected":{"service_type":"ConsultoriaAdopcion","must_include":["ConsultoriaAdopcion","confianza Media"]}}

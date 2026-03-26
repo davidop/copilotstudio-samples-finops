@@ -1,0 +1,151 @@
+mcs.metadata:
+  componentName: FormularioResumen
+  description: Captura estructurada manual de información de oferta en 3 bloques
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: FormularioResumen
+    triggerQueries:
+      - formulario
+      - resumen
+      - introductir manualmente
+      - rellenar
+
+  actions:
+    - kind: SendActivity
+      id: send_intro
+      activity: |
+        **Formulario estructurado de oferta (Catalogo PMO)**
+
+        Vamos a rellenar un resumen en 3 bloques. Tómate tu tiempo.
+
+        **Bloque 1 de 3: Contexto del servicio y objetivo**
+
+    - kind: Question
+      id: ask_cliente
+      alwaysPrompt: true
+      variable: init:Topic.ResumenCliente
+      prompt: "¿Cuál es el nombre del cliente o proyecto?"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_tipo_proyecto
+      alwaysPrompt: true
+      variable: init:Topic.ResumenTipoProyecto
+      prompt: "Que tipo de servicio es? (Licencias, Implantacion SI, Consultoria, Servicios Profesionales, Soporte/Mantenimiento, Bolsa de Horas, Team Agile, SG Volumen, Proyecto Cerrado/Evolutivo, Formacion, Adopcion y Cambio)"
+      entity: StringPrebuiltEntity
+
+    - kind: SetVariable
+      id: set_global_tipo_proyecto
+      variable: Global.ResumenTipoProyecto
+      value: =Topic.ResumenTipoProyecto
+
+    - kind: Question
+      id: ask_objetivo
+      alwaysPrompt: true
+      variable: init:Topic.ResumenObjetivo
+      prompt: "Cual es el objetivo principal del servicio y el resultado esperado?"
+      entity: StringPrebuiltEntity
+
+    - kind: SendActivity
+      id: send_bloque2
+      activity: |
+        ✅ Bloque 1 completado.
+
+        **Bloque 2 de 3: Alcance contractual y equipo**
+
+    - kind: Question
+      id: ask_alcance
+      alwaysPrompt: true
+      variable: init:Topic.ResumenAlcance
+      prompt: "Describe el alcance (que SI se entrega), incluyendo modalidad de colaboracion y entregables"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_exclusiones
+      alwaysPrompt: true
+      variable: init:Topic.ResumenExclusiones
+      prompt: "Que excluye explicitamente? (que NO se entrega)"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_equipo
+      alwaysPrompt: true
+      variable: init:Topic.ResumenEquipoPropuesto
+      prompt: "Que equipo se propone? (roles, seniority, dedicacion y responsable del servicio/proyecto)"
+      entity: StringPrebuiltEntity
+
+    - kind: SendActivity
+      id: send_bloque3
+      activity: |
+        ✅ Bloque 2 completado.
+
+        **Bloque 3 de 3: Planificacion, coste, SLA y riesgos**
+
+    - kind: Question
+      id: ask_duracion
+      alwaysPrompt: true
+      variable: init:Topic.ResumenDuracion
+      prompt: "Cual es la duracion estimada y los hitos principales?"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_esfuerzo
+      alwaysPrompt: true
+      variable: init:Topic.ResumenEsfuerzo
+      prompt: "Cual es el esfuerzo estimado? (horas/FTE o capacidad por sprint/servicio)"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_coste
+      alwaysPrompt: true
+      variable: init:Topic.ResumenCoste
+      prompt: "Cual es el coste o presupuesto? (baseline, fijo, variable, bolsa, extras, penalizaciones si aplica)"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_riesgos
+      alwaysPrompt: true
+      variable: init:Topic.ResumenRiesgos
+      prompt: "Riesgos conocidos? (alcance, plazos, dependencias cliente, SLA, disponibilidad de equipo, calidad)"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_supuestos
+      alwaysPrompt: true
+      variable: init:Topic.ResumenSupuestos
+      prompt: "Supuestos criticos? (modelo contractual, baseline, disponibilidad cliente, accesos, aprobaciones)"
+      entity: StringPrebuiltEntity
+
+    - kind: SendActivity
+      id: send_completion
+      activity: |
+        ✅ Formulario completado.
+
+        Compilando resumen estructurado...
+
+    - kind: SendActivity
+      id: send_summary
+      activity: |
+        **RESUMEN COMPILADO**
+
+        **Cliente / Proyecto:** {Topic.ResumenCliente}
+        **Tipo:** {Topic.ResumenTipoProyecto}
+        **Objetivo:** {Topic.ResumenObjetivo}
+
+        **Alcance:** {Topic.ResumenAlcance}
+        **Exclusiones:** {Topic.ResumenExclusiones}
+
+        **Equipo:** {Topic.ResumenEquipoPropuesto}
+        **Duración:** {Topic.ResumenDuracion}
+        **Esfuerzo:** {Topic.ResumenEsfuerzo}
+        **Coste:** {Topic.ResumenCoste}
+
+        **Riesgos:** {Topic.ResumenRiesgos}
+        **Supuestos:** {Topic.ResumenSupuestos}
+
+    - kind: BeginDialog
+      id: goto_confirmar_alcance_from_manual
+      dialog: crd3a_agente.topic.ConfirmarAlcance

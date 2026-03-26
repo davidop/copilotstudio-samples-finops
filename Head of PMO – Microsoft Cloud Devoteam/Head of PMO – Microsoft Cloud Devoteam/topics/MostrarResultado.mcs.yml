@@ -1,0 +1,98 @@
+mcs.metadata:
+  componentName: MostrarResultado
+  description: Presenta el resultado de validacion
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: MostrarResultado
+    triggerQueries:
+      - mostrar resultado
+      - resultado
+
+  actions:
+    - kind: SendActivity
+      id: send_resultado_header
+      activity: Resultado del analisis documental PMO - Catalogo de Servicios DEVOTEAM
+
+    - kind: SendActivity
+      id: send_resultado_trace
+      activity: "Trazabilidad: tipo de servicio = {Global.TipoServicioPMOSeleccionado} | origen = {Global.ModoDeteccionTipoServicio} | confianza = {Global.ConfianzaDeteccion}"
+
+    - kind: SendActivity
+      id: send_resultado_summary
+      activity: |
+        He analizado el documento o extracto recibido y este es el dictamen PMO:
+
+        Dictamen: {Global.DictamenEstandar}
+        Bloqueadores principales: {Global.BloqueadoresEstandar}
+        Acciones inmediatas: {Global.AccionesInmediatas}
+        Score de calidad estimado: {Global.ScoreCalidadEstimado}
+
+    - kind: SendActivity
+      id: send_resultado_body
+      activity: "{Global.ResultadoValidacion}"
+
+    - kind: Question
+      id: ask_next_action
+      alwaysPrompt: true
+      variable: Topic.AccionSiguiente
+      prompt: Selecciona el siguiente paso sobre este analisis
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Profundizar riesgos y SLA"
+          value: "ProfundizarRiesgos"
+        - display: "Profundizar delivery y staffing"
+          value: "ProfundizarDelivery"
+        - display: "Profundizar economico y modalidad contractual"
+          value: "ProfundizarEconomico"
+        - display: "Mejorar propuesta (estructura PMO)"
+          value: "Mejorar"
+        - display: "Analizar otro documento o nueva revision"
+          value: "NuevaRevision"
+        - display: "Cerrar"
+          value: "Cerrar"
+
+    - kind: ConditionGroup
+      id: route_accion
+      conditions:
+        - id: cond_profundizar_riesgos
+          condition: =Topic.AccionSiguiente = "ProfundizarRiesgos"
+          actions:
+            - kind: BeginDialog
+              id: goto_profundizar_riesgos
+              dialog: crd3a_agente.topic.ProfundizarRiesgos
+
+        - id: cond_profundizar_delivery
+          condition: =Topic.AccionSiguiente = "ProfundizarDelivery"
+          actions:
+            - kind: BeginDialog
+              id: goto_profundizar_delivery
+              dialog: crd3a_agente.topic.ProfundizarDeliveryStaffing
+
+        - id: cond_profundizar_economico
+          condition: =Topic.AccionSiguiente = "ProfundizarEconomico"
+          actions:
+            - kind: BeginDialog
+              id: goto_profundizar_economico
+              dialog: crd3a_agente.topic.ProfundizarEconomico
+
+        - id: cond_mejorar
+          condition: =Topic.AccionSiguiente = "Mejorar"
+          actions:
+            - kind: BeginDialog
+              id: goto_mejorar_oferta
+              dialog: crd3a_agente.topic.MejorarOferta
+
+        - id: cond_nueva_revision
+          condition: =Topic.AccionSiguiente = "NuevaRevision"
+          actions:
+            - kind: BeginDialog
+              id: goto_reinicio_controlado
+              dialog: crd3a_agente.topic.ReinicioControlado
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_cierre_seguro
+          dialog: crd3a_agente.topic.CierreSeguro
