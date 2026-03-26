@@ -1,0 +1,78 @@
+mcs.metadata:
+  componentName: GenerarResumen
+  description: Genera la ficha de cualificacion estructurada con nivel de cualificacion, recomendaciones priorizadas, riesgos y proximo paso comercial
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: GenerarResumen
+    triggerQueries:
+      - generar resumen
+      - ficha de cualificacion
+      - resumen oportunidad
+      - emitir dictamen
+      - ver recomendaciones
+      - resultado cualificacion
+      - dictamen comercial
+
+  actions:
+    - kind: SendActivity
+      id: send_generar_intro
+      activity: Generando ficha de cualificación con las recomendaciones priorizadas para {Global.CualificacionCliente}…
+
+    - kind: SendActivity
+      id: send_instruccion_ia
+      activity: |
+        Basándote en los datos recogidos durante la conversación, emite la ficha completa con este formato exacto:
+
+        ---
+        **FICHA DE CUALIFICACIÓN — {Global.CualificacionCliente}**
+
+        **Sector / Tamaño:** [sector] / [SMB | Mid-Market | Enterprise | Large Enterprise]
+        **Decisor identificado:** [perfil] — [¿acceso directo? Sí / No / Pendiente]
+        **Presupuesto estimado:** [rango]
+        **Timeline:** [urgencia y fechas clave]
+        **Situación actual:** [resumen del punto de partida]
+        **Competencia:** [alternativas evaluadas, si aplica]
+
+        **NIVEL DE CUALIFICACIÓN:** [Alta | Media | Baja]
+        *Justificación:* [2-3 líneas explicando el nivel según criterios BANT+]
+
+        **RECOMENDACIONES PRIORIZADAS**
+        1. [Solución Microsoft] — [Valor de negocio en 1-2 frases, sin tecnicismos]
+        2. [Solución Microsoft] — [Valor de negocio en 1-2 frases, sin tecnicismos]
+        3. [Solución Microsoft] — [Valor de negocio en 1-2 frases, sin tecnicismos] *(si aplica)*
+
+        **RIESGOS Y OBJECIONES ANTICIPADAS**
+        - [riesgo 1]
+        - [riesgo 2]
+
+        **PRÓXIMO PASO RECOMENDADO**
+        [Acción concreta con responsable y plazo sugerido]
+        ---
+
+        Criterios de nivel: Alta (necesidad clara + presupuesto + decisor + plazo <6 meses) / Media (algún dato tentativo o plazo >6 meses) / Baja (necesidad vaga, sin presupuesto o sin decisor).
+        Si falta algún dato crítico, márcalo como [PENDIENTE DE CONFIRMAR].
+
+    - kind: Question
+      id: ask_continuar_tras_resumen
+      alwaysPrompt: true
+      variable: init:Topic.ContinuarTrasResumen
+      prompt: "¿Quieres definir ahora el próximo paso comercial?"
+      entity: BooleanPrebuiltEntity
+
+    - kind: ConditionGroup
+      id: route_continuar
+      conditions:
+        - id: cond_si_continuar
+          condition: =Topic.ContinuarTrasResumen = true
+          actions:
+            - kind: BeginDialog
+              id: goto_cierre_comercial
+              dialog: crd3a_agent.topic.CierreComercial
+
+      elseActions:
+        - kind: SendActivity
+          id: send_fin_resumen
+          activity: Ficha guardada. Cuando quieras definir el siguiente paso o cualificar otra oportunidad, estoy aquí.

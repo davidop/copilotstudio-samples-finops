@@ -1,0 +1,135 @@
+mcs.metadata:
+  componentName: RecomendarSolucion
+  description: Recomendaciones priorizadas de soluciones Microsoft para una necesidad o area concreta, con valor de negocio y siguiente paso
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: RecomendarSolucion
+    triggerQueries:
+      - recomendar solucion
+      - que soluciones recomiendas
+      - que producto microsoft
+      - que oferta microsoft
+      - soluciones microsoft
+      - que le propongo al cliente
+      - alternativas microsoft
+      - portfolio microsoft
+      - que tiene microsoft para
+
+  actions:
+    - kind: SendActivity
+      id: send_recomendar_intro
+      activity: |
+        Para darte las recomendaciones más ajustadas, necesito conocer la prioridad principal del cliente.
+
+    - kind: Question
+      id: ask_area_prioridad
+      alwaysPrompt: true
+      variable: init:Topic.AreaPrioridad
+      prompt: "¿Cuál es el área de mayor prioridad para el cliente?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Productividad y colaboración (M365, Teams, Copilot)"
+          value: "Productividad"
+        - display: "Seguridad y cumplimiento (Defender, Sentinel, Purview, Entra)"
+          value: "Seguridad"
+        - display: "Datos e Inteligencia Artificial (Fabric, Azure OpenAI, Power BI)"
+          value: "DatosIA"
+        - display: "Infraestructura y nube (Azure, migración, modernización)"
+          value: "Infraestructura"
+        - display: "CRM, ERP y automatización (Dynamics 365, Power Platform)"
+          value: "CRMERP"
+        - display: "Varias áreas o no lo sé aún"
+          value: "Multi"
+
+    - kind: Question
+      id: ask_tamano_rec
+      alwaysPrompt: true
+      variable: init:Topic.TamanoRec
+      prompt: "¿Cuál es el tamaño del cliente?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "SMB — menos de 50 empleados"
+          value: "SMB"
+        - display: "Mid-Market — 50 a 999 empleados"
+          value: "MidMarket"
+        - display: "Enterprise — 1.000 a 9.999 empleados"
+          value: "Enterprise"
+        - display: "Large Enterprise — más de 10.000 empleados"
+          value: "LargeEnterprise"
+
+    - kind: Question
+      id: ask_contexto_rec
+      alwaysPrompt: true
+      variable: init:Topic.ContextoRec
+      prompt: "Describe brevemente el reto o necesidad principal del cliente (2-3 líneas)"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_competencia_rec
+      alwaysPrompt: true
+      variable: init:Topic.CompetenciaRec
+      prompt: "¿Hay competencia presente que debamos tener en cuenta?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "No, evaluación solo Microsoft"
+          value: "SoloMicrosoft"
+        - display: "Sí, Google Workspace"
+          value: "Google"
+        - display: "Sí, AWS"
+          value: "AWS"
+        - display: "Sí, Salesforce"
+          value: "Salesforce"
+        - display: "Sí, otro competidor"
+          value: "Otro"
+        - display: "No lo sé"
+          value: "Desconocido"
+
+    - kind: SendActivity
+      id: send_procesando_rec
+      activity: Generando recomendaciones priorizadas para el área {Topic.AreaPrioridad} en cliente {Topic.TamanoRec}…
+
+    - kind: SendActivity
+      id: send_instruccion_ia_rec
+      activity: |
+        Basándote en el área de prioridad "{Topic.AreaPrioridad}", el tamaño "{Topic.TamanoRec}", el contexto "{Topic.ContextoRec}" y la competencia "{Topic.CompetenciaRec}", entrega:
+
+        **RECOMENDACIONES MICROSOFT — {Topic.AreaPrioridad}**
+
+        Para cada recomendación (máximo 3), incluye:
+        - **Solución**: nombre comercial del producto o familia
+        - **Por qué encaja**: valor de negocio específico para este cliente (1-2 frases, sin tecnicismos)
+        - **Diferencial competitivo**: argumento clave frente a la competencia presente (si aplica)
+        - **Siguiente paso sugerido**: acción concreta (demo, workshop, assessment, PoC)
+
+        Adapta el mensaje al segmento:
+        - SMB: simplicidad, precio predecible, implantación rápida
+        - Mid-Market: equilibrio funcionalidad-coste, adopción, escalabilidad
+        - Enterprise/Large Enterprise: arquitectura, seguridad avanzada, gobierno, acuerdos EA/MCA
+
+        Si hay competencia de Google, AWS o Salesforce, incluye un argumento diferenciador claro y honesto.
+        No inventes precios, roadmaps ni funcionalidades que no existan.
+
+    - kind: Question
+      id: ask_cualificar_tras_rec
+      alwaysPrompt: true
+      variable: init:Topic.CualificarTrasRec
+      prompt: "¿Quieres hacer una cualificación completa BANT+ de esta oportunidad?"
+      entity: BooleanPrebuiltEntity
+
+    - kind: ConditionGroup
+      id: route_tras_rec
+      conditions:
+        - id: cond_si_cualificar
+          condition: =Topic.CualificarTrasRec = true
+          actions:
+            - kind: BeginDialog
+              id: goto_cualificar_desde_rec
+              dialog: crd3a_agent.topic.CualificarOportunidad
+
+      elseActions:
+        - kind: SendActivity
+          id: send_fin_rec
+          activity: Cuando necesites profundizar o preparar el paso siguiente, dímelo.

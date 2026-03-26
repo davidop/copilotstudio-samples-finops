@@ -32,10 +32,11 @@ beginDialog:
 
             Mi caso principal es recibir un documento de oferta, analizarlo y devolverte un dictamen PMO accionable.
 
-            Puedes empezar de tres formas:
+            Puedes empezar de cuatro formas:
             - Adjunta un documento en PDF, PPTX o DOCX para analisis automatico.
-            - Pega un extracto del contenido.
+            - Pega un extracto del contenido directamente en el chat.
             - Accede al menu si quieres una revision guiada o una mejora concreta.
+            - Escribe "formulario" si no tienes el documento a mano — te guio por 3 preguntas estructuradas.
 
             Referencia activa PMO Intranet:
             https://sites.google.com/devoteam.com/es-intranet/conoce-a-devoteam-spain/nuestras-ofertas-experiencia/pmo

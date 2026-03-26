@@ -1,0 +1,119 @@
+mcs.metadata:
+  componentName: CierreComercial
+  description: Definicion del proximo paso comercial concreto tras la cualificacion, incluyendo tipo de accion, responsable y plazo
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: CierreComercial
+    triggerQueries:
+      - proximo paso
+      - siguiente paso
+      - que hacemos ahora
+      - accion comercial
+      - cierre
+      - avanzar con el cliente
+      - proponer reunion
+      - preparar propuesta
+
+  actions:
+    - kind: SendActivity
+      id: send_cierre_intro
+      activity: |
+        Vamos a definir el próximo paso comercial concreto para avanzar con {Global.CualificacionCliente}.
+
+        ¿Qué tipo de acción tiene más sentido en este momento?
+
+    - kind: Question
+      id: ask_tipo_accion
+      alwaysPrompt: true
+      variable: init:Topic.TipoAccion
+      prompt: "Selecciona el tipo de acción comercial más adecuada"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Demo de producto (45-60 min, enfocada en la necesidad)"
+          value: "Demo"
+        - display: "Workshop de descubrimiento (2-4 h, mapeo de necesidades y arquitectura)"
+          value: "Workshop"
+        - display: "Assessment / diagnóstico (evaluación del estado actual)"
+          value: "Assessment"
+        - display: "Prueba de concepto / PoC (validación técnica acotada)"
+          value: "PoC"
+        - display: "Propuesta económica formal"
+          value: "Propuesta"
+        - display: "Reunión ejecutiva con el decisor"
+          value: "ReuniónEjecutiva"
+
+    - kind: Question
+      id: ask_responsable
+      alwaysPrompt: true
+      variable: init:Topic.Responsable
+      prompt: "¿Quién lidera esta acción por parte de Devoteam? (nombre o rol)"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_plazo_accion
+      alwaysPrompt: true
+      variable: init:Topic.PlazoAccion
+      prompt: "¿En qué plazo se debería ejecutar esta acción?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Esta semana"
+          value: "EstaSemana"
+        - display: "En los próximos 15 días"
+          value: "15Dias"
+        - display: "En el próximo mes"
+          value: "UnMes"
+        - display: "Sin fecha definida aún"
+          value: "SinFecha"
+
+    - kind: Question
+      id: ask_contacto_cliente
+      alwaysPrompt: true
+      variable: init:Topic.ContactoCliente
+      prompt: "¿Cuál es el contacto en el cliente para coordinar esta acción? (nombre, cargo o email)"
+      entity: StringPrebuiltEntity
+
+    - kind: SendActivity
+      id: send_plan_accion
+      activity: |
+        **PLAN DE ACCIÓN COMERCIAL**
+
+        **Cliente:** {Global.CualificacionCliente}
+        **Acción siguiente:** {Topic.TipoAccion}
+        **Responsable Devoteam:** {Topic.Responsable}
+        **Plazo objetivo:** {Topic.PlazoAccion}
+        **Contacto cliente:** {Topic.ContactoCliente}
+
+    - kind: SendActivity
+      id: send_instruccion_ia_cierre
+      activity: |
+        Basándote en el tipo de acción seleccionada y el contexto de la oportunidad, redacta:
+
+        1. **Objetivo de la acción** — qué queremos conseguir con este paso (2-3 líneas)
+        2. **Agenda sugerida** — estructura de tiempos y bloques para la reunión o sesión
+        3. **Mensaje de convocatoria** — borrador de email o Teams para enviar al contacto del cliente, tono profesional y directo, sin tecnicismos innecesarios
+        4. **Criterio de éxito** — cómo sabremos que este paso fue exitoso y qué abre el siguiente
+
+    - kind: Question
+      id: ask_nueva_oportunidad
+      alwaysPrompt: true
+      variable: init:Topic.NuevaOportunidad
+      prompt: "¿Quieres cualificar otra oportunidad o necesitas algo más?"
+      entity: BooleanPrebuiltEntity
+
+    - kind: ConditionGroup
+      id: route_nueva_oportunidad
+      conditions:
+        - id: cond_si_nueva
+          condition: =Topic.NuevaOportunidad = true
+          actions:
+            - kind: BeginDialog
+              id: goto_menu_nueva
+              dialog: crd3a_agent.topic.MenuPrincipal
+
+      elseActions:
+        - kind: SendActivity
+          id: send_despedida_cierre
+          activity: Perfecto. Cuando tengas otra oportunidad o necesites preparar una acción comercial, aquí me tienes.

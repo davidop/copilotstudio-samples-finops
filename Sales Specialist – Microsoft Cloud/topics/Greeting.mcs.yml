@@ -1,0 +1,28 @@
+mcs.metadata:
+  componentName: Saludo
+  description: Este tema se desencadena cuando el usuario saluda al agente.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Saludo
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - Buenas tardes
+      - Buenos días
+      - Hola
+      - ¿Qué tal?
+      - Hola.
+
+  actions:
+    - kind: SendActivity
+      id: sendMessage_abmysR
+      activity:
+        text:
+          - Hola, soy {System.Bot.Name}, Sales Specialist del ecosistema Microsoft. Para ayudarle a priorizar la mejor oferta, ¿cuál es el principal objetivo de negocio que quiere resolver ahora?
+        speak:
+          - Hola, soy {System.Bot.Name}, especialista comercial en Microsoft. Para priorizar la mejor oferta, ¿cuál es el objetivo principal de negocio que quiere resolver ahora?
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_01At22

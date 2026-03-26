@@ -303,10 +303,30 @@ beginDialog:
       variable: Global.TipoServicioPMOSeleccionado
       value: =Topic.TipoServicioPMO
 
-    - kind: SetVariable
-      id: set_summary_dictamen
-      variable: Global.DictamenEstandar
-      value: "Requiere cambios antes de envio al cliente"
+    - kind: ConditionGroup
+      id: set_dictamen_dinamico
+      conditions:
+        - id: cond_dictamen_aprobable
+          condition: =Global.ConfianzaDeteccion = "Alta" And Global.ModoDeteccionTipoServicio = "Automatica"
+          actions:
+            - kind: SetVariable
+              id: set_dictamen_aprobable
+              variable: Global.DictamenEstandar
+              value: "Aprobable con cambios menores — tipo de servicio detectado con alta confianza. Revisar bloqueadores antes del envío."
+
+        - id: cond_dictamen_info_insuficiente
+          condition: =Global.ConfianzaDeteccion = "Baja" And Global.ModoDeteccionTipoServicio = "Manual"
+          actions:
+            - kind: SetVariable
+              id: set_dictamen_info_insuficiente
+              variable: Global.DictamenEstandar
+              value: "No recomendable en estado actual — información insuficiente para dictamen definitivo. Completar alcance, modelo económico y riesgos."
+
+      elseActions:
+        - kind: SetVariable
+          id: set_dictamen_requiere_cambios
+          variable: Global.DictamenEstandar
+          value: "Requiere cambios antes de envío al cliente — revisar bloqueadores y cerrar huecos identificados."
 
     - kind: SetVariable
       id: set_summary_bloqueadores
@@ -321,19 +341,27 @@ beginDialog:
     - kind: ConditionGroup
       id: set_quality_score
       conditions:
-        - id: cond_quality_auto
-          condition: =Global.ModoDeteccionTipoServicio = "Automatica"
+        - id: cond_quality_alta_auto
+          condition: =Global.ModoDeteccionTipoServicio = "Automatica" And Global.ConfianzaDeteccion = "Alta"
           actions:
             - kind: SetVariable
-              id: set_quality_score_auto
+              id: set_quality_score_alta_auto
               variable: Global.ScoreCalidadEstimado
-              value: "80/100"
+              value: "75/100 (estructural — tipo de servicio detectado automáticamente con confianza alta; el score real depende del análisis de contenido)"
+
+        - id: cond_quality_media_auto
+          condition: =Global.ModoDeteccionTipoServicio = "Automatica" And Global.ConfianzaDeteccion = "Media"
+          actions:
+            - kind: SetVariable
+              id: set_quality_score_media_auto
+              variable: Global.ScoreCalidadEstimado
+              value: "60/100 (estructural — tipo inferido por nombre de archivo; confirmar manualmente antes de confiar en este score)"
 
       elseActions:
         - kind: SetVariable
           id: set_quality_score_manual
           variable: Global.ScoreCalidadEstimado
-          value: "65/100"
+          value: "50/100 (orientativo — datos introducidos manualmente; score mejorará al adjuntar documento completo)"
 
     - kind: BeginDialog
       id: goto_mostrar_resultado

@@ -1,0 +1,15 @@
+mcs.metadata:
+  componentName: Inicio de la conversación
+  description: Este tema del sistema se desencadena cuando el agente recibe una actividad que indica el inicio de una nueva conversación. Si no desea que el agente inicie la conversación, deshabilite este tema.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: SendActivity
+      id: sendMessage_M0LuhV
+      activity:
+        text:
+          - Hola, soy {System.Bot.Name}, Sales Specialist del ecosistema Microsoft. Le ayudaré a cualificar su oportunidad y a priorizar las soluciones con mayor impacto para su negocio. Para empezar, ¿cuál es el principal objetivo que quiere conseguir ahora mismo?
+        speak:
+          - Hola, soy {System.Bot.Name}, especialista comercial en soluciones Microsoft. Le ayudaré a cualificar su oportunidad y a priorizar la mejor oferta. Para empezar, ¿cuál es el objetivo principal que quiere conseguir ahora mismo?

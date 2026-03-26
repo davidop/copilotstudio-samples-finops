@@ -1,0 +1,77 @@
+mcs.metadata:
+  componentName: MenuPrincipal
+  description: Menu principal del Sales Specialist con acceso guiado a los flujos de cualificacion y recomendacion
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: MenuPrincipal
+    triggerQueries:
+      - menu
+      - menu principal
+      - opciones
+      - volver al menu
+      - inicio
+      - ayuda
+      - que puedes hacer
+      - que haces
+      - como funciona
+
+  actions:
+    - kind: SendActivity
+      id: send_menu_title
+      activity: |
+        Soy tu Sales Specialist del ecosistema Microsoft. Puedo ayudarte en cualquiera de estos escenarios:
+
+        **1. Cualificar una oportunidad** — Recogida guiada de datos BANT+ y emisión de ficha de cualificación
+        **2. Recomendar soluciones Microsoft** — Recomendaciones priorizadas para una necesidad concreta
+        **3. Preparar el próximo paso comercial** — Definir la acción de avance (demo, workshop, assessment, propuesta)
+        **4. Generar ficha de resumen** — Resumen estructurado de una oportunidad ya cualificada
+
+        Si prefieres, cuéntame directamente qué necesitas y empezamos sin menú.
+
+    - kind: Question
+      id: ask_menu_choice
+      alwaysPrompt: true
+      variable: init:Topic.OpcionMenu
+      prompt: ¿Con qué te ayudo?
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Cualificar una oportunidad comercial"
+          value: "Cualificar"
+        - display: "Recomendar soluciones Microsoft para un cliente"
+          value: "Recomendar"
+        - display: "Definir el próximo paso comercial"
+          value: "CierreComercial"
+        - display: "Generar ficha de resumen de oportunidad"
+          value: "Resumen"
+
+    - kind: ConditionGroup
+      id: route_menu
+      conditions:
+        - id: cond_cualificar
+          condition: =Topic.OpcionMenu = "Cualificar"
+          actions:
+            - kind: BeginDialog
+              id: goto_cualificar
+              dialog: crd3a_agent.topic.CualificarOportunidad
+
+        - id: cond_recomendar
+          condition: =Topic.OpcionMenu = "Recomendar"
+          actions:
+            - kind: BeginDialog
+              id: goto_recomendar
+              dialog: crd3a_agent.topic.RecomendarSolucion
+
+        - id: cond_cierre
+          condition: =Topic.OpcionMenu = "CierreComercial"
+          actions:
+            - kind: BeginDialog
+              id: goto_cierre
+              dialog: crd3a_agent.topic.CierreComercial
+
+      elseActions:
+        - kind: BeginDialog
+          id: goto_resumen
+          dialog: crd3a_agent.topic.GenerarResumen

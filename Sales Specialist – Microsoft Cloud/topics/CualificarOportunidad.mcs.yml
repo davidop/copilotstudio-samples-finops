@@ -1,0 +1,232 @@
+mcs.metadata:
+  componentName: CualificarOportunidad
+  description: Flujo guiado de cualificacion BANT+ en 3 bloques para recoger contexto de oportunidad y emitir nivel de cualificacion con recomendaciones
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: CualificarOportunidad
+    triggerQueries:
+      - cualificar
+      - cualificar oportunidad
+      - nueva oportunidad
+      - tengo un cliente
+      - quiero cualificar
+      - analizar oportunidad
+      - oportunidad comercial
+      - lead
+      - pipeline
+
+  actions:
+    - kind: SendActivity
+      id: send_intro
+      activity: |
+        Vamos a cualificar la oportunidad en 3 bloques. Tómate tu tiempo en cada pregunta.
+
+        **Bloque 1 de 3: Contexto del cliente**
+
+    - kind: Question
+      id: ask_cliente
+      alwaysPrompt: true
+      variable: init:Topic.Cliente
+      prompt: "¿Cuál es el nombre del cliente o cómo identificas esta oportunidad?"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_sector
+      alwaysPrompt: true
+      variable: init:Topic.Sector
+      prompt: "¿En qué sector opera el cliente?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Retail / Comercio"
+          value: "Retail"
+        - display: "Manufactura / Industria"
+          value: "Manufactura"
+        - display: "Servicios Financieros / Banca / Seguros"
+          value: "FinancialServices"
+        - display: "Salud / Sanidad / Farma"
+          value: "Salud"
+        - display: "Sector Público / Administración"
+          value: "SectorPublico"
+        - display: "Tecnología / Software / IT"
+          value: "Tecnologia"
+        - display: "Energía / Utilities"
+          value: "Energia"
+        - display: "Distribución / Logística"
+          value: "Distribucion"
+        - display: "Otro sector"
+          value: "Otro"
+
+    - kind: Question
+      id: ask_tamano
+      alwaysPrompt: true
+      variable: init:Topic.Tamano
+      prompt: "¿Cuál es el tamaño aproximado del cliente?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "SMB — menos de 50 empleados"
+          value: "SMB"
+        - display: "Mid-Market — 50 a 999 empleados"
+          value: "MidMarket"
+        - display: "Enterprise — 1.000 a 9.999 empleados"
+          value: "Enterprise"
+        - display: "Large Enterprise — más de 10.000 empleados"
+          value: "LargeEnterprise"
+
+    - kind: Question
+      id: ask_situacion_actual
+      alwaysPrompt: true
+      variable: init:Topic.SituacionActual
+      prompt: "¿Cuál es la situación tecnológica actual del cliente? (proveedor, plataformas, si están en renovación o migración)"
+      entity: StringPrebuiltEntity
+
+    - kind: SendActivity
+      id: send_bloque2
+      activity: |
+        Bloque 1 completado.
+
+        **Bloque 2 de 3: Datos de la oportunidad (BANT)**
+
+    - kind: Question
+      id: ask_necesidad
+      alwaysPrompt: true
+      variable: init:Topic.Necesidad
+      prompt: "¿Cuál es el reto o dolor principal del cliente? (descríbelo en términos de negocio, no tecnológicos)"
+      entity: StringPrebuiltEntity
+
+    - kind: Question
+      id: ask_prioridad
+      alwaysPrompt: true
+      variable: init:Topic.Prioridad
+      prompt: "¿Cuál es el área de prioridad principal?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Productividad y colaboración (M365, Teams, Copilot)"
+          value: "Productividad"
+        - display: "Seguridad y cumplimiento (Defender, Sentinel, Purview, Entra)"
+          value: "Seguridad"
+        - display: "Datos e Inteligencia Artificial (Fabric, Azure OpenAI, Power BI)"
+          value: "DatosIA"
+        - display: "Infraestructura y nube (Azure, migración, modernización)"
+          value: "Infraestructura"
+        - display: "CRM, ERP y automatización (Dynamics 365, Power Platform)"
+          value: "CRMERP"
+        - display: "Varias áreas combinadas"
+          value: "Multi"
+
+    - kind: Question
+      id: ask_budget
+      alwaysPrompt: true
+      variable: init:Topic.Budget
+      prompt: "¿Cuál es el rango de presupuesto estimado?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Menos de 50.000 €"
+          value: "Menos50K"
+        - display: "50.000 € — 200.000 €"
+          value: "50K200K"
+        - display: "200.000 € — 1.000.000 €"
+          value: "200K1M"
+        - display: "Más de 1.000.000 €"
+          value: "Mas1M"
+        - display: "Sin presupuesto definido aún"
+          value: "SinPresupuesto"
+
+    - kind: Question
+      id: ask_decisor
+      alwaysPrompt: true
+      variable: init:Topic.Decisor
+      prompt: "¿Cuál es el perfil del decisor de compra y tienes acceso directo a él?"
+      entity: StringPrebuiltEntity
+
+    - kind: SendActivity
+      id: send_bloque3
+      activity: |
+        Bloque 2 completado.
+
+        **Bloque 3 de 3: Plazo y contexto competitivo**
+
+    - kind: Question
+      id: ask_timeline
+      alwaysPrompt: true
+      variable: init:Topic.Timeline
+      prompt: "¿Cuál es la urgencia o plazo para avanzar en esta oportunidad?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "Inmediata — menos de 3 meses"
+          value: "Inmediata"
+        - display: "Corto plazo — 3 a 6 meses"
+          value: "CortoPlazo"
+        - display: "Medio plazo — 6 a 12 meses"
+          value: "MedioPlazo"
+        - display: "Sin fecha definida"
+          value: "SinFecha"
+
+    - kind: Question
+      id: ask_competencia
+      alwaysPrompt: true
+      variable: init:Topic.Competencia
+      prompt: "¿Se están evaluando también otras soluciones o proveedores?"
+      entity: StringPrebuiltEntity
+      choices:
+        - display: "No, solo Microsoft"
+          value: "SoloMicrosoft"
+        - display: "Sí, también Google Workspace"
+          value: "Google"
+        - display: "Sí, también AWS"
+          value: "AWS"
+        - display: "Sí, también Salesforce"
+          value: "Salesforce"
+        - display: "Sí, otro proveedor"
+          value: "Otro"
+        - display: "No lo sé todavía"
+          value: "Desconocido"
+
+    - kind: Question
+      id: ask_notas_adicionales
+      alwaysPrompt: true
+      variable: init:Topic.NotasAdicionales
+      prompt: "¿Hay algún dato adicional relevante para esta oportunidad? (hitos, dependencias, riesgos conocidos, contacto clave…)"
+      entity: StringPrebuiltEntity
+
+    - kind: SendActivity
+      id: send_completion
+      activity: |
+        Bloque 3 completado. Procesando ficha de cualificación…
+
+    - kind: SendActivity
+      id: send_resumen_compilado
+      activity: |
+        **FICHA DE CUALIFICACIÓN**
+
+        **Cliente / Oportunidad:** {Topic.Cliente}
+        **Sector / Tamaño:** {Topic.Sector} / {Topic.Tamano}
+        **Situación actual:** {Topic.SituacionActual}
+        **Necesidad principal:** {Topic.Necesidad}
+        **Área de prioridad:** {Topic.Prioridad}
+        **Presupuesto estimado:** {Topic.Budget}
+        **Decisor identificado:** {Topic.Decisor}
+        **Timeline:** {Topic.Timeline}
+        **Competencia presente:** {Topic.Competencia}
+        **Notas adicionales:** {Topic.NotasAdicionales}
+
+    - kind: SetVariable
+      id: set_global_cliente
+      variable: Global.CualificacionCliente
+      value: =Topic.Cliente
+
+    - kind: SetVariable
+      id: set_global_prioridad
+      variable: Global.CualificacionPrioridad
+      value: =Topic.Prioridad
+
+    - kind: SetVariable
+      id: set_global_tamano
+      variable: Global.CualificacionTamano
+      value: =Topic.Tamano
+
+    - kind: BeginDialog
+      id: goto_generar_resumen
+      dialog: crd3a_agent.topic.GenerarResumen

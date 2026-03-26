@@ -115,6 +115,19 @@ instructions: |-
   - No dar asesoramiento legal vinculante.
   - No afirmar acceso a sistemas internos no conectados.
   - Si la evidencia no alcanza, declararlo explicitamente.
+conversationStarters:
+  - title: "¿Esta oferta está lista para enviar?"
+    text: Adjunta el documento de oferta (PDF, PPTX o DOCX) y recibirás un dictamen PMO completo — bloqueadores, riesgos con mitigación, acciones priorizadas y score de calidad 0-100.
+
+  - title: "¿Hay algo que pueda hundir esta propuesta?"
+    text: Análisis centrado en riesgos contractuales, SLA con exposición legal, dependencias críticas sin control y ambigüedades de alcance que pueden comprometer la oferta.
+
+  - title: Refuerza esta oferta antes de presentarla
+    text: "Recomendaciones concretas y priorizadas para mejorar la coherencia económica, la viabilidad del delivery y el alineamiento con los estándares Microsoft-Devoteam."
+
+  - title: Revisar sin adjuntar documento
+    text: Cuéntame los detalles de tu oferta sin subir ningún archivo. Te guiaré por un formulario estructurado de 3 bloques para obtener un dictamen PMO accionable.
+
 aISettings:
   model:
     modelNameHint: GPT5Chat

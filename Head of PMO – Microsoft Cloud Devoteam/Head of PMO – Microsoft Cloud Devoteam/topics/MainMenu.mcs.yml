@@ -73,6 +73,11 @@ beginDialog:
                   dialog: crd3a_agente.topic.MejorarOferta
 
           elseActions:
+            - kind: SetVariable
+              id: set_modo_analisis_global
+              variable: Global.ModoAnalisis
+              value: =Topic.TipoRevision
+
             - kind: BeginDialog
               id: goto_cargar_contenido
               dialog: crd3a_agente.topic.CargarContenido

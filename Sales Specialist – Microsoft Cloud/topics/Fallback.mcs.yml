@@ -1,0 +1,22 @@
+mcs.metadata:
+  componentName: Alternativa
+  description: Este tema del sistema se desencadena cuando la expresión del usuario no coincide con ningún tema existente.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnUnknownIntent
+  id: main
+  actions:
+    - kind: ConditionGroup
+      id: conditionGroup_LktzXw
+      conditions:
+        - id: conditionItem_tlGIVo
+          condition: =System.FallbackCount < 3
+          actions:
+            - kind: SendActivity
+              id: sendMessage_QZreqo
+              activity: Para ayudarle mejor, voy a enfocarlo en modo cualificación comercial. Indíqueme, por favor: 1) qué objetivo de negocio quiere lograr, 2) cuál es su prioridad principal (productividad, seguridad, datos e IA, infraestructura o CRM), y 3) en qué plazo quiere avanzar.
+
+      elseActions:
+        - kind: BeginDialog
+          id: 5aXj5M
+          dialog: crd3a_agent.topic.Escalate

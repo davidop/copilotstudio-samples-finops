@@ -1,0 +1,3 @@
+﻿connectionReferences:
+  - connectionReferenceLogicalName: crd3a_agent.shared_crd3a-5fmicrosoft-20learn-20mcp-20server-5fa26eec5424bc2750.4fe7d59ce1174616af775b47fba794ad
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_crd3a-5fmicrosoft-20learn-20mcp-20server-5fa26eec5424bc2750

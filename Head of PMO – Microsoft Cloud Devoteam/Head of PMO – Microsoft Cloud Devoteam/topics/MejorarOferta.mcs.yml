@@ -31,9 +31,93 @@ beginDialog:
         - display: "Propuesta completa"
           value: "Completa"
 
-    - kind: SendActivity
-      id: send_mejora_body
-      activity: "Sugerencia de mejora PMO: alinea la oferta con su categoria de servicio, usa la plantilla oficial vigente, refuerza calidad, planificacion/control, condiciones economicas y riesgos contractuales."
+    - kind: ConditionGroup
+      id: route_mejora_por_aspecto
+      conditions:
+        - id: cond_mejora_resumen_ejecutivo
+          condition: =Topic.AspectoDeMejora = "ResumenEjecutivo"
+          actions:
+            - kind: SendActivity
+              id: send_mejora_resumen_ejecutivo
+              activity: |
+                **Mejora: Resumen Ejecutivo**
+
+                Un buen resumen ejecutivo PMO debe responder en máximo media página a:
+                1. ¿Qué problema resuelve esta propuesta y para quién?
+                2. ¿Cuál es la solución propuesta y su diferencial Microsoft-Devoteam?
+                3. ¿Cuánto cuesta, cuánto dura y qué riesgo asume el cliente?
+                4. ¿Por qué Devoteam y no otro proveedor?
+
+                **Comprueba:** ¿Hay cifras concretas (coste, horas, plazos)? ¿Se menciona el beneficio de negocio esperado? ¿Está redactado para que lo lea alguien que no conoce el proyecto?
+
+        - id: cond_mejora_alcance
+          condition: =Topic.AspectoDeMejora = "Alcance"
+          actions:
+            - kind: SendActivity
+              id: send_mejora_alcance
+              activity: |
+                **Mejora: Alcance**
+
+                El alcance PMO aprobable debe tener:
+                1. Lista explícita de lo que SE entrega (entregables, funcionalidades, servicios activados).
+                2. Lista explícita de exclusiones — lo que NO está incluido.
+                3. Supuestos que condicionan el alcance (disponibilidad cliente, accesos, aprobaciones).
+                4. Proceso de gestión de cambios si el alcance se amplía.
+
+                **Riesgo habitual:** Alcance redactado con verbos vagos ("apoyar", "colaborar", "acompañar") sin entregables tangibles. Cada línea de alcance debe poder verificarse al cierre del proyecto.
+
+        - id: cond_mejora_riesgos
+          condition: =Topic.AspectoDeMejora = "Riesgos"
+          actions:
+            - kind: SendActivity
+              id: send_mejora_riesgos
+              activity: |
+                **Mejora: Riesgos**
+
+                La sección de riesgos PMO debe incluir para cada riesgo:
+                - Descripción del riesgo (qué puede ocurrir).
+                - Probabilidad (Alta/Media/Baja).
+                - Impacto (Alto/Medio/Bajo).
+                - Mitigación concreta (qué se hace para reducirlo).
+                - Owner (quién es responsable de la mitigación).
+
+                **Riesgos típicos a verificar en ofertas Microsoft Cloud:**
+                - Dependencia de licencias del cliente no confirmadas.
+                - Accesos a tenant o entornos no garantizados en firma.
+                - Disponibilidad del equipo técnico del cliente para validaciones.
+                - SLA con exposición legal sin cláusula de exclusión por causas externas.
+
+        - id: cond_mejora_narrativa
+          condition: =Topic.AspectoDeMejora = "Narrativa"
+          actions:
+            - kind: SendActivity
+              id: send_mejora_narrativa
+              activity: |
+                **Mejora: Narrativa Comercial y Propuesta de Valor**
+
+                Una narrativa que convence al cliente tiene:
+                1. Contexto del cliente: demuestra que entendemos su situación actual.
+                2. Tensión: el coste de no actuar o el riesgo de hacerlo mal.
+                3. Solución: qué propone Devoteam específicamente, no genéricamente.
+                4. Credenciales: referencias o capacidades relevantes para este caso concreto.
+                5. Call to action: qué decisión se pide al cliente y para cuándo.
+
+                **Evitar:** Copiar-pegar descripciones de producto Microsoft como propuesta de valor. El valor es lo que Devoteam aporta encima del producto.
+
+      elseActions:
+        - kind: SendActivity
+          id: send_mejora_completa
+          activity: |
+            **Mejora: Propuesta Completa**
+
+            Para una revisión completa alineada con el Catálogo PMO DEVOTEAM, verifica estas 6 áreas en orden:
+
+            1. **Resumen ejecutivo** — ¿Responde al problema, solución, coste y diferencial?
+            2. **Alcance y exclusiones** — ¿Hay lista explícita de entregables y de lo que NO se hace?
+            3. **Modelo económico** — ¿Baseline, fijo, variable o bolsa? ¿Penalizaciones claras?
+            4. **Delivery y equipo** — ¿Roles, seniority, dedicación y responsable de servicio definidos?
+            5. **Riesgos con mitigación** — ¿Cada riesgo tiene probabilidad, impacto, mitigación y owner?
+            6. **Calidad ejecutiva** — ¿Está maquetada con la plantilla oficial? ¿Sin erratas ni datos de otro cliente?
 
     - kind: Question
       id: ask_mejora_action
